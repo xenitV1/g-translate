@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*.zip
+*.crx
+*.xpi
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API Keys and sensitive data - api-config.js removed for security
+**/api-keys.json
+**/secrets.json
+
+# Browser extension specific
+manifest.json.backup
+*.pem
+*.key
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Logs
+logs/
+*.log
+
+# Backup files
+*.bak
+*.backup
+
+# Sensitive configuration files
+config/local.json
+config/secrets.json

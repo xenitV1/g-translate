@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G-Translate</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Header -->
+        <header class="popup-header">
+            <div class="logo">
+                <img src="../assets/icons/icon32.png" alt="G-Translate" class="logo-icon">
+                <h1 class="logo-text">G-Translate</h1>
+            </div>
+            <div class="header-actions">
+                <button class="icon-button" id="settings-btn" title="Ayarlar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                    </svg>
+                </button>
+                <button class="icon-button" id="history-btn" title="Geçmiş">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="popup-main">
+            <!-- Text Input Area -->
+            <section class="input-section">
+                <div class="text-input-container">
+                    <textarea 
+                        id="text-input" 
+                        class="text-input" 
+                        placeholder="Çevirmek istediğiniz metni buraya yazın..."
+                        rows="4"
+                    ></textarea>
+                    <div class="input-footer">
+                        <span class="char-count" id="char-count">0/5000</span>
+                        <button class="clear-btn" id="clear-btn" title="Temizle">×</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Language Selection -->
+            <section class="language-section">
+                <div class="language-selector">
+                    <label class="language-label">
+                        <span class="label-text">Çevir:</span>
+                        <div class="detection-indicator" id="detection-indicator">
+                            <span class="ai-icon">🤖</span>
+                            <span class="detected-language">Kaynak dil tespit edilecek</span>
+                        </div>
+                    </label>
+                    <select id="target-language" class="language-select">
+                        <option value="tr">🇹🇷 Türkçe</option>
+                        <option value="en">🇺🇸 English</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="it">🇮🇹 Italiano</option>
+                        <option value="pt">🇵🇹 Português</option>
+                        <option value="ru">🇷🇺 Русский</option>
+                        <option value="ja">🇯🇵 日本語</option>
+                        <option value="ko">🇰🇷 한국어</option>
+                        <option value="zh">🇨🇳 中文</option>
+                        <option value="ar">🇸🇦 العربية</option>
+                        <option value="hi">🇮🇳 हिन्दी</option>
+                        <option value="th">🇹🇭 ไทย</option>
+                        <option value="vi">🇻🇳 Tiếng Việt</option>
+                        <option value="pl">🇵🇱 Polski</option>
+                        <option value="nl">🇳🇱 Nederlands</option>
+                        <option value="sv">🇸🇪 Svenska</option>
+                        <option value="da">🇩🇰 Dansk</option>
+                        <option value="no">🇳🇴 Norsk</option>
+                        <option value="fi">🇫🇮 Suomi</option>
+                        <option value="cs">🇨🇿 Čeština</option>
+                        <option value="sk">🇸🇰 Slovenčina</option>
+                        <option value="hu">🇭🇺 Magyar</option>
+                        <option value="ro">🇷🇴 Română</option>
+                        <option value="bg">🇧🇬 Български</option>
+                        <option value="hr">🇭🇷 Hrvatski</option>
+                        <option value="sr">🇷🇸 Српски</option>
+                        <option value="sl">🇸🇮 Slovenščina</option>
+                        <option value="et">🇪🇪 Eesti</option>
+                        <option value="lv">🇱🇻 Latviešu</option>
+                        <option value="lt">🇱🇹 Lietuvių</option>
+                        <option value="el">🇬🇷 Ελληνικά</option>
+                        <option value="he">🇮🇱 עברית</option>
+                        <option value="fa">🇮🇷 فارسی</option>
+                        <option value="ur">🇵🇰 اردو</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Translate Button -->
+            <section class="action-section">
+                <button id="translate-btn" class="translate-btn" disabled>
+                    <span class="btn-icon">🔤</span>
+                    <span class="btn-text">Çevir</span>
+                </button>
+            </section>
+
+            <!-- Loading State -->
+            <section class="loading-section" id="loading-section" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p class="loading-text" id="loading-text">Çevriliyor...</p>
+            </section>
+
+            <!-- Translation Result -->
+            <section class="result-section" id="result-section" style="display: none;">
+                <div class="result-container">
+                    <div class="result-header">
+                        <div class="language-info">
+                            <span class="source-lang" id="source-lang">Kaynak</span>
+                            <span class="arrow">→</span>
+                            <span class="target-lang" id="target-lang">Hedef</span>
+                        </div>
+                        <div class="confidence-score" id="confidence-score" style="display: none;">
+                            <span class="confidence-label">Güven:</span>
+                            <span class="confidence-value">95%</span>
+                        </div>
+                    </div>
+                    <div class="result-content">
+                        <div class="translated-text" id="translated-text"></div>
+                        <div class="result-actions">
+                            <button class="action-btn copy-btn" id="copy-btn" title="Kopyala">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span>Kopyala</span>
+                            </button>
+                            <button class="action-btn save-btn" id="save-btn" title="Kaydet">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                                    <polyline points="7,3 7,8 15,8"></polyline>
+                                </svg>
+                                <span>Kaydet</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error State -->
+            <section class="error-section" id="error-section" style="display: none;">
+                <div class="error-container">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-content">
+                        <h3 class="error-title">Çeviri Hatası</h3>
+                        <p class="error-message" id="error-message">Bir hata oluştu. Lütfen tekrar deneyin.</p>
+                        <button class="retry-btn" id="retry-btn">Tekrar Dene</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="popup-footer">
+            <div class="footer-info">
+                <span class="api-status" id="api-status">API Bağlantısı Kontrol Ediliyor...</span>
+            </div>
+            <div class="footer-actions">
+                <button class="footer-btn" id="help-btn" title="Yardım">?</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../cross-browser/polyfills.js"></script>
+    <script src="../utils/constants.js"></script>
+    <script src="../utils/language-codes.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
