@@ -407,21 +407,24 @@ class PopupController {
      */
     showTranslationResult(result) {
         this.currentTranslation = result;
-        
+
+        // Önce tüm bölümleri gizle (özellikle loading section'ı)
+        this.hideAllSections();
+
         // Dil bilgilerini güncelle
         this.elements.sourceLang.textContent = result.sourceLanguage.name;
         this.elements.targetLang.textContent = result.targetLanguage.name;
-        
+
         // Çeviri metnini göster
         this.elements.translatedText.textContent = result.translatedText;
-        
+
         // Güven skorunu göster
         if (result.confidence && this.settings.showConfidence) {
             this.elements.confidenceScore.style.display = 'flex';
-            this.elements.confidenceScore.querySelector('.confidence-value').textContent = 
+            this.elements.confidenceScore.querySelector('.confidence-value').textContent =
                 `${Math.round(result.confidence * 100)}%`;
         }
-        
+
         // Sonuç bölümünü göster
         this.elements.resultSection.style.display = 'block';
         this.elements.resultSection.classList.add('fade-in');
@@ -431,6 +434,9 @@ class PopupController {
      * Hata göster
      */
     showError(message) {
+        // Önce tüm bölümleri gizle (özellikle loading section'ı)
+        this.hideAllSections();
+
         this.elements.errorMessage.textContent = message;
         this.elements.errorSection.style.display = 'block';
         this.elements.errorSection.classList.add('fade-in');

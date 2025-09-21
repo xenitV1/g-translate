@@ -210,12 +210,12 @@ class ContentScriptController {
      * Klavye kısayolları
      */
     handleKeyboardShortcuts(event) {
-        // Ctrl+Shift+T ile hızlı çeviri
-        if (event.ctrlKey && event.shiftKey && event.key === 'T') {
+        // Ctrl+Shift+Y ile hızlı çeviri
+        if (event.ctrlKey && event.shiftKey && event.key === 'Y') {
             event.preventDefault();
             this.quickTranslate();
         }
-        
+
         // Escape ile popup'ları kapat
         if (event.key === 'Escape') {
             this.clearCurrentSelection();
@@ -265,10 +265,10 @@ class ContentScriptController {
      */
     handleScroll() {
         // Popup pozisyonunu güncelle
-        if (this.instantTranslator && this.instantTranslator.isPopupVisible()) {
-            this.instantTranslator.positionPopup();
+        if (this.instantTranslator && this.instantTranslator.isVisible()) {
+            this.instantTranslator.updatePosition();
         }
-
+        
         if (this.translationOverlay && this.translationOverlay.isVisible()) {
             this.translationOverlay.updatePosition();
         }
