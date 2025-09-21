@@ -1,6 +1,6 @@
 /**
  * Language Codes and Utilities
- * Dil kodları ve yardımcı fonksiyonlar
+ * Language codes and utility functions
  */
 
 const LANGUAGE_CODES = {
@@ -156,21 +156,21 @@ const LANGUAGE_FLAGS = {
 
 class LanguageUtils {
   /**
-   * Dil kodundan dil adını al
+   * Get language name from language code
    */
   static getLanguageName(code) {
     return LANGUAGE_CODES[code] || "Unknown";
   }
 
   /**
-   * Dil kodundan bayrağı al
+   * Get language flag from language code
    */
   static getLanguageFlag(code) {
     return LANGUAGE_FLAGS[code] || "🌐";
   }
 
   /**
-   * Dil adından kodu al
+   * Get language code from language name
    */
   static getLanguageCode(name) {
     const entry = Object.entries(LANGUAGE_CODES).find(
@@ -180,7 +180,7 @@ class LanguageUtils {
   }
 
   /**
-   * Desteklenen dilleri al
+   * Get supported languages
    */
   static getSupportedLanguages() {
     return Object.keys(LANGUAGE_CODES).map((code) => ({
@@ -191,28 +191,28 @@ class LanguageUtils {
   }
 
   /**
-   * Dil kodunu doğrula
+   * Validate language code
    */
   static isValidLanguageCode(code) {
     return code in LANGUAGE_CODES;
   }
 
   /**
-   * Dil adını doğrula
+   * Validate language name
    */
   static isValidLanguageName(name) {
     return Object.values(LANGUAGE_CODES).includes(name);
   }
 
   /**
-   * Aynı dil kontrolü
+   * Check if languages are the same
    */
   static isSameLanguage(code1, code2) {
     return code1 === code2;
   }
 
   /**
-   * Dil ailesi bilgisi
+   * Get language family information
    */
   static getLanguageFamily(code) {
     const families = {
@@ -236,7 +236,7 @@ class LanguageUtils {
   }
 
   /**
-   * Yazı sistemi bilgisi
+   * Get writing system information
    */
   static getWritingSystem(code) {
     const systems = {
@@ -260,7 +260,7 @@ class LanguageUtils {
   }
 
   /**
-   * Dil yönü (RTL/LTR)
+   * Get text direction (RTL/LTR)
    */
   static getTextDirection(code) {
     const rtlLanguages = ["ar", "he", "fa", "ur"];
@@ -268,7 +268,7 @@ class LanguageUtils {
   }
 
   /**
-   * Dil seçenekleri için format
+   * Format language option for select elements
    */
   static formatLanguageOption(code) {
     const name = this.getLanguageName(code);
@@ -283,7 +283,7 @@ class LanguageUtils {
   }
 
   /**
-   * Tüm dilleri seçenek formatında al
+   * Get all languages in option format
    */
   static getAllLanguageOptions() {
     return Object.keys(LANGUAGE_CODES)
@@ -292,7 +292,7 @@ class LanguageUtils {
   }
 
   /**
-   * Popüler dilleri al
+   * Get popular languages
    */
   static getPopularLanguages() {
     const popularCodes = [

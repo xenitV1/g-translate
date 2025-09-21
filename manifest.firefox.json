@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "G-Translate",
   "version": "1.0.0",
-  "description": "Google Gemini API ile güçlü çeviri eklentisi - AI powered translation",
+  "description": "Turn any AI into a translation app - Multi-AI powered translation extension",
   "permissions": ["activeTab", "storage", "contextMenus", "<all_urls>"],
   "browser_action": {
     "default_popup": "popup/popup.html",
@@ -40,21 +40,21 @@
         "default": "Ctrl+Shift+T",
         "mac": "Command+Shift+T"
       },
-      "description": "Seçili metni çevir / Hızlı çeviri"
+      "description": "Translate selected text / Quick translate"
     },
     "open-history": {
       "suggested_key": {
         "default": "Ctrl+Shift+H",
         "mac": "Command+Shift+H"
       },
-      "description": "Çeviri geçmişini aç"
+      "description": "Open translation history"
     },
     "open-settings": {
       "suggested_key": {
         "default": "Ctrl+Shift+S",
         "mac": "Command+Shift+S"
       },
-      "description": "Ayarları aç"
+      "description": "Open settings"
     }
   },
   "browser_specific_settings": {

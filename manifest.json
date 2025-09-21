@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "G-Translate",
   "version": "1.0.0",
-  "description": "Google Gemini API ile güçlü çeviri eklentisi - AI powered translation",
+  "description": "Turn any AI into a translation app - Multi-AI powered translation extension",
   "permissions": ["activeTab", "storage", "scripting", "contextMenus"],
   "host_permissions": ["<all_urls>"],
   "action": {

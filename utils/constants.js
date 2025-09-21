@@ -1,13 +1,13 @@
 /**
  * Application Constants
- * Uygulama sabitleri ve konfigürasyon değerleri
+ * Application constants and configuration values
  */
 
 const APP_CONSTANTS = {
   // Application Info
   APP_NAME: "G-Translate",
   APP_VERSION: "1.0.0",
-  APP_DESCRIPTION: "Google Gemini API ile güçlü çeviri eklentisi",
+  APP_DESCRIPTION: "Powerful translation extension with AI integration",
 
   // Extension Info
   EXTENSION_ID: "gemini-translate-extension",
@@ -239,7 +239,7 @@ const APP_CONSTANTS = {
 
   // Supported Languages
   SUPPORTED_LANGUAGES: [
-    { code: "tr", name: "Türkçe", flag: "🇹🇷" },
+    { code: "tr", name: "Turkish", flag: "🇹🇷" },
     { code: "en", name: "English", flag: "🇺🇸" },
     { code: "es", name: "Español", flag: "🇪🇸" },
     { code: "fr", name: "Français", flag: "🇫🇷" },

@@ -1,6 +1,6 @@
 /**
  * Options Page Logic
- * Ayarlar sayfası için JavaScript fonksiyonları
+ * JavaScript functions for the options page
  */
 
 class OptionsController {
@@ -13,34 +13,34 @@ class OptionsController {
   }
 
   /**
-   * Options sayfasını başlat
+   * Initialize the options page
    */
   async init() {
     try {
-      // DOM elementlerini al
+      // Get DOM elements
       this.elements = this.getElements();
 
-      // Ayarları yükle
+      // Load settings
       await this.loadSettings();
 
-      // Event listener'ları ekle
+      // Add event listeners
       this.attachEventListeners();
 
-      // UI'ı güncelle
+      // Update UI
       this.updateUI();
 
       // API durumunu kontrol et
       await this.checkAPIStatus();
 
-      console.log("Options sayfası başlatıldı");
+      console.log("Options page initialized");
     } catch (error) {
-      console.error("Options başlatma hatası:", error);
-      this.showError("Ayarlar yüklenemedi");
+      console.error("Options initialization error:", error);
+      this.showError("Settings could not be loaded");
     }
   }
 
   /**
-   * DOM elementlerini al
+   * Get DOM elements
    */
   getElements() {
     const elements = {
@@ -110,7 +110,7 @@ class OptionsController {
   }
 
   /**
-   * Event listener'ları ekle
+   * Add event listeners
    */
   attachEventListeners() {
     // Navigation
@@ -342,29 +342,29 @@ class OptionsController {
     const shortcuts = [
       {
         id: "translate",
-        name: "Hızlı Çeviri",
-        description: "Seçili metni çevir veya popup aç",
+        name: "Quick Translate",
+        description: "Translate selected text or open popup",
         defaultKey: "Ctrl+Shift+T",
         currentKey: null,
       },
       {
         id: "history",
-        name: "Geçmişi Aç",
-        description: "Çeviri geçmişini göster",
+        name: "Open History",
+        description: "Show translation history",
         defaultKey: "Ctrl+Shift+H",
         currentKey: null,
       },
       {
         id: "settings",
-        name: "Ayarları Aç",
-        description: "Bu ayarlar sayfasını aç",
+        name: "Open Settings",
+        description: "Open this settings page",
         defaultKey: "Ctrl+Shift+S",
         currentKey: null,
       },
       {
         id: "close",
-        name: "Popup Kapat",
-        description: "Açık popup'ları kapat",
+        name: "Close Popup",
+        description: "Close open popups",
         defaultKey: "Escape",
         currentKey: null,
       },
@@ -395,13 +395,13 @@ class OptionsController {
             data-shortcut-id="${shortcut.id}"
             value="${shortcut.currentKey}"
             readonly
-            placeholder="Kısayol girin"
+            placeholder="Enter shortcut"
           />
           <button
             type="button"
             class="shortcut-reset"
             data-shortcut-id="${shortcut.id}"
-            title="Varsayılana sıfırla"
+            title="Reset to default"
           >
             🔄
           </button>
@@ -439,7 +439,7 @@ class OptionsController {
    */
   startShortcutRecording(input) {
     const originalValue = input.value;
-    input.value = "Tuş kombinasyonu bekleniyor...";
+    input.value = "Waiting for key combination...";
     input.classList.add("recording");
 
     const handleKeyDown = (e) => {
@@ -493,7 +493,7 @@ class OptionsController {
         input.classList.remove("recording");
         this.saveShortcut(input.dataset.shortcutId, shortcut);
       } else {
-        input.value = "Geçersiz kısayol!";
+        input.value = "Invalid shortcut!";
         setTimeout(() => {
           input.value = originalValue;
           input.classList.remove("recording");
@@ -571,16 +571,16 @@ class OptionsController {
       });
       
       this.settings = settings;
-      console.log(`Kısayol kaydedildi: ${shortcutId} = ${shortcut}`);
+      console.log(`Shortcut saved: ${shortcutId} = ${shortcut}`);
 
       // Content script'e bildir (hata olsa da devam et)
       this.notifyContentScript("SHORTCUTS_UPDATED", settings.shortcuts);
       
       // Başarı mesajı göster
-      this.showSuccess(`Kısayol kaydedildi: ${shortcut}`);
+      this.showSuccess(`Shortcut saved: ${shortcut}`);
     } catch (error) {
-      console.error("Kısayol kaydetme hatası:", error);
-      this.showError("Kısayol kaydedilemedi");
+      console.error("Shortcut save error:", error);
+      this.showError("Shortcut could not be saved");
     }
   }
 
@@ -711,7 +711,7 @@ class OptionsController {
       if (currentAPIResult.success) {
         const currentAPI = currentAPIResult.data;
         
-        // UI'ı güncelle (sadece gerekli kısımları)
+        // Update UI (sadece gerekli kısımları)
         if (this.elements.apiProvider) {
           this.elements.apiProvider.value = currentAPI.id;
         }
@@ -931,7 +931,7 @@ class OptionsController {
       const apiKeyResult = await chrome.storage.local.get([storageKey]);
       const apiKey = apiKeyResult[storageKey];
 
-      // UI'ı güncelle
+      // Update UI
       this.elements.apiKey.value = apiKey || "";
 
       // API bilgilerini al ve açıklamayı güncelle
@@ -1195,10 +1195,10 @@ class OptionsController {
       this.elements.saveSettings.style.opacity = "0.6";
 
       this.updateLastSavedTime();
-      this.showSuccess("Ayarlar başarıyla kaydedildi");
+      this.showSuccess("Settings saved successfully");
     } catch (error) {
-      console.error("Ayarlar kaydetme hatası:", error);
-      this.showError("Ayarlar kaydedilemedi");
+      console.error("Settings save error:", error);
+      this.showError("Settings could not be saved");
     } finally {
       this.setLoadingState(false);
     }

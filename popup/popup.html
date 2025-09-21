@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,7 +19,7 @@
           <h1 class="logo-text">G-Translate</h1>
         </div>
         <div class="header-actions">
-          <button class="icon-button" id="settings-btn" title="Ayarlar">
+          <button class="icon-button" id="settings-btn" title="Settings">
             <svg
               width="16"
               height="16"
@@ -32,7 +32,7 @@
               <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
             </svg>
           </button>
-          <button class="icon-button" id="history-btn" title="Geçmiş">
+          <button class="icon-button" id="history-btn" title="History">
             <svg
               width="16"
               height="16"
@@ -58,12 +58,12 @@
             <textarea
               id="text-input"
               class="text-input"
-              placeholder="Çevirmek istediğiniz metni buraya yazın..."
+              placeholder="Type the text you want to translate here..."
               rows="4"
             ></textarea>
             <div class="input-footer">
               <span class="char-count" id="char-count">0/5000</span>
-              <button class="clear-btn" id="clear-btn" title="Temizle">
+              <button class="clear-btn" id="clear-btn" title="Clear">
                 ×
               </button>
             </div>
@@ -74,11 +74,11 @@
         <section class="language-section">
           <div class="language-selector">
             <label class="language-label">
-              <span class="label-text">Çevir:</span>
+              <span class="label-text">Translate:</span>
               <div class="detection-indicator" id="detection-indicator">
                 <span class="ai-icon">🤖</span>
                 <span class="detected-language"
-                  >Kaynak dil tespit edilecek</span
+                  >Source language will be detected</span
                 >
               </div>
             </label>
@@ -127,7 +127,7 @@
         <section class="action-section">
           <button id="translate-btn" class="translate-btn" disabled>
             <span class="btn-icon">🔤</span>
-            <span class="btn-text">Çevir</span>
+            <span class="btn-text">Translate</span>
           </button>
         </section>
 
@@ -138,7 +138,7 @@
           style="display: none"
         >
           <div class="loading-spinner"></div>
-          <p class="loading-text" id="loading-text">Çevriliyor...</p>
+          <p class="loading-text" id="loading-text">Translating...</p>
         </section>
 
         <!-- Translation Result -->
@@ -150,16 +150,16 @@
           <div class="result-container">
             <div class="result-header">
               <div class="language-info">
-                <span class="source-lang" id="source-lang">Kaynak</span>
+                <span class="source-lang" id="source-lang">Source</span>
                 <span class="arrow">→</span>
-                <span class="target-lang" id="target-lang">Hedef</span>
+                <span class="target-lang" id="target-lang">Target</span>
               </div>
               <div
                 class="confidence-score"
                 id="confidence-score"
                 style="display: none"
               >
-                <span class="confidence-label">Güven:</span>
+                <span class="confidence-label">Confidence:</span>
                 <span class="confidence-value">95%</span>
               </div>
             </div>
@@ -169,7 +169,7 @@
                 <button
                   class="action-btn copy-btn"
                   id="copy-btn"
-                  title="Kopyala"
+                  title="Copy"
                 >
                   <svg
                     width="14"
@@ -191,12 +191,12 @@
                       d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
                     ></path>
                   </svg>
-                  <span>Kopyala</span>
+                  <span>Copy</span>
                 </button>
                 <button
                   class="action-btn save-btn"
                   id="save-btn"
-                  title="Kaydet"
+                  title="Save"
                 >
                   <svg
                     width="14"
@@ -212,7 +212,7 @@
                     <polyline points="17,21 17,13 7,13 7,21"></polyline>
                     <polyline points="7,3 7,8 15,8"></polyline>
                   </svg>
-                  <span>Kaydet</span>
+                  <span>Save</span>
                 </button>
               </div>
             </div>
@@ -224,11 +224,11 @@
           <div class="error-container">
             <div class="error-icon">⚠️</div>
             <div class="error-content">
-              <h3 class="error-title">Çeviri Hatası</h3>
+              <h3 class="error-title">Translation Error</h3>
               <p class="error-message" id="error-message">
-                Bir hata oluştu. Lütfen tekrar deneyin.
+                An error occurred. Please try again.
               </p>
-              <button class="retry-btn" id="retry-btn">Tekrar Dene</button>
+              <button class="retry-btn" id="retry-btn">Try Again</button>
             </div>
           </div>
         </section>
@@ -238,11 +238,11 @@
       <footer class="popup-footer">
         <div class="footer-info">
           <span class="api-status" id="api-status"
-            >API Bağlantısı Kontrol Ediliyor...</span
+            >Checking API Connection...</span
           >
         </div>
         <div class="footer-actions">
-          <button class="footer-btn" id="help-btn" title="Yardım">?</button>
+          <button class="footer-btn" id="help-btn" title="Help">?</button>
         </div>
       </footer>
     </div>

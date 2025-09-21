@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ayarlar - G-Translate</title>
+    <title>Settings - G-Translate</title>
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
@@ -14,9 +14,9 @@
           <div class="header-left">
             <h1 class="settings-title">
               <span class="title-icon">⚙️</span>
-              G-Translate Ayarları
+              G-Translate Settings
             </h1>
-            <p class="settings-subtitle">Çeviri deneyiminizi kişiselleştirin</p>
+            <p class="settings-subtitle">Turn any AI into your personal translation assistant</p>
           </div>
           <div class="header-right">
             <div class="version-info">
@@ -33,27 +33,27 @@
           <ul class="nav-list">
             <li class="nav-item active" data-tab="general">
               <span class="nav-icon">🔧</span>
-              <span class="nav-text">Genel</span>
+              <span class="nav-text">General</span>
             </li>
             <li class="nav-item" data-tab="api">
               <span class="nav-icon">🔑</span>
-              <span class="nav-text">API Ayarları</span>
+              <span class="nav-text">API Settings</span>
             </li>
             <li class="nav-item" data-tab="languages">
               <span class="nav-icon">🌐</span>
-              <span class="nav-text">Dil Ayarları</span>
+              <span class="nav-text">Language Settings</span>
             </li>
             <li class="nav-item" data-tab="shortcuts">
               <span class="nav-icon">⌨️</span>
-              <span class="nav-text">Kısayollar</span>
+              <span class="nav-text">Shortcuts</span>
             </li>
             <li class="nav-item" data-tab="appearance">
               <span class="nav-icon">🎨</span>
-              <span class="nav-text">Görünüm</span>
+              <span class="nav-text">Appearance</span>
             </li>
             <li class="nav-item" data-tab="advanced">
               <span class="nav-icon">🔬</span>
-              <span class="nav-text">Gelişmiş</span>
+              <span class="nav-text">Advanced</span>
             </li>
           </ul>
         </nav>
@@ -63,18 +63,18 @@
           <!-- General Settings -->
           <div class="settings-panel active" id="general-panel">
             <div class="panel-header">
-              <h2 class="panel-title">Genel Ayarlar</h2>
+              <h2 class="panel-title">General Settings</h2>
               <p class="panel-description">
-                Temel çeviri ayarlarını yapılandırın
+                Configure basic translation settings
               </p>
             </div>
 
             <div class="settings-group">
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Otomatik Dil Tespiti</label>
+                  <label class="setting-label">Auto Language Detection</label>
                   <p class="setting-description">
-                    AI ile kaynak dili otomatik olarak tespit et
+                    Automatically detect source language with AI
                   </p>
                 </div>
                 <div class="setting-control">
@@ -87,9 +87,9 @@
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Anında Çeviri</label>
+                  <label class="setting-label">Instant Translation</label>
                   <p class="setting-description">
-                    Metin seçildiğinde otomatik popup göster
+                    Show automatic popup when text is selected
                   </p>
                 </div>
                 <div class="setting-control">
@@ -104,7 +104,7 @@
                 <div class="setting-info">
                   <label class="setting-label">Context Menu</label>
                   <p class="setting-description">
-                    Sağ tık menüsünde çeviri seçeneği göster
+                    Show translation option in right-click menu
                   </p>
                 </div>
                 <div class="setting-control">
@@ -117,9 +117,9 @@
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Bildirimler</label>
+                  <label class="setting-label">Notifications</label>
                   <p class="setting-description">
-                    Çeviri tamamlandığında bildirim göster
+                    Show notification when translation is completed
                   </p>
                 </div>
                 <div class="setting-control">
@@ -135,31 +135,31 @@
           <!-- API Settings -->
           <div class="settings-panel" id="api-panel">
             <div class="panel-header">
-              <h2 class="panel-title">API Ayarları</h2>
-              <p class="panel-description">Google Gemini API konfigürasyonu</p>
+              <h2 class="panel-title">API Settings</h2>
+              <p class="panel-description">Multi-AI API configuration - Connect any AI to your translation workflow</p>
             </div>
 
             <div class="settings-group">
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">AI API Sağlayıcısı</label>
+                  <label class="setting-label">AI API Provider</label>
                   <p class="setting-description">
-                    Kullanmak istediğiniz AI API'sini seçin
+                    Select the AI API you want to use
                   </p>
                 </div>
                 <div class="setting-control">
                   <select id="api-provider" class="api-provider-select">
-                    <option value="">API seçin...</option>
-                    <!-- API'ler dinamik olarak yüklenecek -->
+                    <option value="">Select API...</option>
+                    <!-- APIs will be loaded dynamically -->
                   </select>
                 </div>
               </div>
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">API Anahtarı</label>
+                  <label class="setting-label">API Key</label>
                   <p class="setting-description" id="api-key-description">
-                    Google Gemini API anahtarınızı girin
+                    Enter your AI API key (Gemini, OpenAI, Claude, etc.)
                   </p>
                 </div>
                 <div class="setting-control">
@@ -168,13 +168,13 @@
                       type="password"
                       id="api-key"
                       class="api-key-input"
-                      placeholder="API anahtarınızı girin"
+                      placeholder="Enter your API key"
                     />
                     <button
                       type="button"
                       id="toggle-api-key"
                       class="toggle-api-key"
-                      title="Göster/Gizle"
+                      title="Show/Hide"
                     >
                       <svg
                         width="16"
@@ -196,33 +196,33 @@
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">API Durumu</label>
-                  <p class="setting-description">Mevcut API bağlantı durumu</p>
+                  <label class="setting-label">API Status</label>
+                  <p class="setting-description">Current API connection status</p>
                 </div>
                 <div class="setting-control">
                   <div class="api-status" id="api-status">
                     <span class="status-indicator"></span>
-                    <span class="status-text">Kontrol ediliyor...</span>
+                    <span class="status-text">Checking...</span>
                   </div>
                 </div>
               </div>
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">API Kullanımı</label>
+                  <label class="setting-label">API Usage</label>
                   <p class="setting-description">
-                    Günlük API kullanım istatistikleri
+                    Daily API usage statistics
                   </p>
                 </div>
                 <div class="setting-control">
                   <div class="api-usage" id="api-usage">
                     <div class="usage-item">
-                      <span class="usage-label">Bugün:</span>
-                      <span class="usage-value">0 çeviri</span>
+                      <span class="usage-label">Today:</span>
+                      <span class="usage-value">0 translations</span>
                     </div>
                     <div class="usage-item">
-                      <span class="usage-label">Bu ay:</span>
-                      <span class="usage-value">0 çeviri</span>
+                      <span class="usage-label">This month:</span>
+                      <span class="usage-value">0 translations</span>
                     </div>
                   </div>
                 </div>
@@ -231,32 +231,32 @@
               <!-- Rate Limit Status -->
               <div class="setting-item" id="rate-limit-item" style="display: none;">
                 <div class="setting-info">
-                  <label class="setting-label">Rate Limit Durumu</label>
+                  <label class="setting-label">Rate Limit Status</label>
                   <p class="setting-description">
-                    API istek limitleri ve kalan kullanım
+                    API request limits and remaining usage
                   </p>
                 </div>
                 <div class="setting-control">
                   <div class="rate-limit-status" id="rate-limit-status">
                     <div class="limit-item">
                       <div class="limit-header">
-                        <span class="limit-label">Günlük Limit</span>
+                        <span class="limit-label">Daily Limit</span>
                         <span class="limit-value" id="daily-limit">0/250</span>
                       </div>
                       <div class="limit-bar">
                         <div class="limit-progress" id="daily-progress" style="width: 0%"></div>
                       </div>
-                      <div class="limit-reset" id="daily-reset">Sıfırlanma: Yarın 00:00</div>
+                      <div class="limit-reset" id="daily-reset">Reset: Tomorrow 00:00</div>
                     </div>
                     <div class="limit-item">
                       <div class="limit-header">
-                        <span class="limit-label">Saatlik Limit</span>
+                        <span class="limit-label">Hourly Limit</span>
                         <span class="limit-value" id="hourly-limit">0/50</span>
                       </div>
                       <div class="limit-bar">
                         <div class="limit-progress" id="hourly-progress" style="width: 0%"></div>
                       </div>
-                      <div class="limit-reset" id="hourly-reset">Sıfırlanma: 1 saat sonra</div>
+                      <div class="limit-reset" id="hourly-reset">Reset: In 1 hour</div>
                     </div>
                   </div>
                 </div>
@@ -267,18 +267,18 @@
           <!-- Language Settings -->
           <div class="settings-panel" id="languages-panel">
             <div class="panel-header">
-              <h2 class="panel-title">Dil Ayarları</h2>
+              <h2 class="panel-title">Language Settings</h2>
               <p class="panel-description">
-                Varsayılan dil tercihlerinizi ayarlayın
+                Configure your default language preferences
               </p>
             </div>
 
             <div class="settings-group">
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Varsayılan Hedef Dil</label>
+                  <label class="setting-label">Default Target Language</label>
                   <p class="setting-description">
-                    Çeviriler için varsayılan hedef dil
+                    Default target language for translations
                   </p>
                 </div>
                 <div class="setting-control">
@@ -301,9 +301,9 @@
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Desteklenen Diller</label>
+                  <label class="setting-label">Supported Languages</label>
                   <p class="setting-description">
-                    Çeviri için kullanılabilir diller
+                    Available languages for translation
                   </p>
                 </div>
                 <div class="setting-control">
@@ -318,9 +318,9 @@
           <!-- Shortcuts Settings -->
           <div class="settings-panel" id="shortcuts-panel">
             <div class="panel-header">
-              <h2 class="panel-title">Klavye Kısayolları</h2>
+              <h2 class="panel-title">Keyboard Shortcuts</h2>
               <p class="panel-description">
-                Hızlı erişim için klavye kısayollarını yapılandırın
+                Configure keyboard shortcuts for quick access
               </p>
             </div>
 
@@ -330,8 +330,7 @@
               </div>
               <div class="shortcuts-help">
                 <p class="help-text">
-                  <strong>💡 İpucu:</strong> Kısayolları değiştirmek için tuş
-                  kombinasyonuna tıklayın ve yeni kombinasyonu girin.
+                  <strong>💡 Tip:</strong> Click on a key combination to change shortcuts and enter a new combination.
                 </p>
               </div>
             </div>
@@ -340,34 +339,34 @@
           <!-- Appearance Settings -->
           <div class="settings-panel" id="appearance-panel">
             <div class="panel-header">
-              <h2 class="panel-title">Görünüm Ayarları</h2>
-              <p class="panel-description">Arayüz görünümünü kişiselleştirin</p>
+              <h2 class="panel-title">Appearance Settings</h2>
+              <p class="panel-description">Customize the interface appearance</p>
             </div>
 
             <div class="settings-group">
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Tema</label>
-                  <p class="setting-description">Arayüz temasını seçin</p>
+                  <label class="setting-label">Theme</label>
+                  <p class="setting-description">Select the interface theme</p>
                 </div>
                 <div class="setting-control">
                   <div class="theme-selector">
                     <label class="theme-option">
                       <input type="radio" name="theme" value="light" checked />
                       <span class="theme-preview light-theme">
-                        <span class="theme-name">Açık</span>
+                        <span class="theme-name">Light</span>
                       </span>
                     </label>
                     <label class="theme-option">
                       <input type="radio" name="theme" value="dark" />
                       <span class="theme-preview dark-theme">
-                        <span class="theme-name">Koyu</span>
+                        <span class="theme-name">Dark</span>
                       </span>
                     </label>
                     <label class="theme-option">
                       <input type="radio" name="theme" value="auto" />
                       <span class="theme-preview auto-theme">
-                        <span class="theme-name">Otomatik</span>
+                        <span class="theme-name">Auto</span>
                       </span>
                     </label>
                   </div>
@@ -376,23 +375,23 @@
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Font Boyutu</label>
-                  <p class="setting-description">Metin boyutunu ayarlayın</p>
+                  <label class="setting-label">Font Size</label>
+                  <p class="setting-description">Adjust the text size</p>
                 </div>
                 <div class="setting-control">
                   <select id="font-size" class="font-size-select">
-                    <option value="small">Küçük</option>
-                    <option value="medium" selected>Orta</option>
-                    <option value="large">Büyük</option>
+                    <option value="small">Small</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="large">Large</option>
                   </select>
                 </div>
               </div>
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Güven Skoru Göster</label>
+                  <label class="setting-label">Show Confidence Score</label>
                   <p class="setting-description">
-                    Çeviri güvenilirliğini göster
+                    Display translation reliability
                   </p>
                 </div>
                 <div class="setting-control">
@@ -408,18 +407,18 @@
           <!-- Advanced Settings -->
           <div class="settings-panel" id="advanced-panel">
             <div class="panel-header">
-              <h2 class="panel-title">Gelişmiş Ayarlar</h2>
+              <h2 class="panel-title">Advanced Settings</h2>
               <p class="panel-description">
-                Uzman kullanıcılar için gelişmiş seçenekler
+                Advanced options for expert users
               </p>
             </div>
 
             <div class="settings-group">
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Maksimum Geçmiş</label>
+                  <label class="setting-label">Maximum History</label>
                   <p class="setting-description">
-                    Saklanacak maksimum çeviri sayısı
+                    Maximum number of translations to store
                   </p>
                 </div>
                 <div class="setting-control">
@@ -436,9 +435,9 @@
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Cache Temizleme</label>
+                  <label class="setting-label">Cache Clearing</label>
                   <p class="setting-description">
-                    Önbelleği temizle ve performansı artır
+                    Clear cache and improve performance
                   </p>
                 </div>
                 <div class="setting-control">
@@ -448,16 +447,16 @@
                     class="action-button secondary"
                   >
                     <span class="button-icon">🗑️</span>
-                    Cache Temizle
+                    Clear Cache
                   </button>
                 </div>
               </div>
 
               <div class="setting-item">
                 <div class="setting-info">
-                  <label class="setting-label">Veri Sıfırlama</label>
+                  <label class="setting-label">Data Reset</label>
                   <p class="setting-description">
-                    Tüm ayarları ve geçmişi sıfırla
+                    Reset all settings and history
                   </p>
                 </div>
                 <div class="setting-control">
@@ -467,7 +466,7 @@
                     class="action-button danger"
                   >
                     <span class="button-icon">⚠️</span>
-                    Tüm Verileri Sıfırla
+                    Reset All Data
                   </button>
                 </div>
               </div>
@@ -486,7 +485,7 @@
               class="action-button primary"
             >
               <span class="button-icon">💾</span>
-              Ayarları Kaydet
+              Save Settings
             </button>
             <button
               type="button"
@@ -494,13 +493,13 @@
               class="action-button secondary"
             >
               <span class="button-icon">🔄</span>
-              Sıfırla
+              Reset
             </button>
           </div>
           <div class="footer-right">
             <div class="footer-info">
               <span class="info-text"
-                >Son güncelleme: <span id="last-saved">-</span></span
+                >Last updated: <span id="last-saved">-</span></span
               >
             </div>
           </div>

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Çeviri Geçmişi - G-Translate</title>
+    <title>Translation History - G-Translate</title>
     <link rel="stylesheet" href="history-popup.css" />
   </head>
   <body>
@@ -13,17 +13,17 @@
         <div class="header-left">
           <h2 class="history-title">
             <span class="title-icon">📚</span>
-            Çeviri Geçmişi
+            Translation History
           </h2>
           <div class="history-stats">
-            <span id="history-count">0 çeviri</span>
+            <span id="history-count">0 translations</span>
           </div>
         </div>
         <div class="header-actions">
           <button
             id="clear-history-btn"
             class="action-btn clear-btn"
-            title="Geçmişi temizle"
+            title="Clear history"
           >
             <svg
               width="16"
@@ -38,12 +38,12 @@
                 d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"
               ></path>
             </svg>
-            Temizle
+            Clear
           </button>
           <button
             id="close-history-btn"
             class="action-btn close-btn"
-            title="Kapat"
+            title="Close"
           >
             <svg
               width="16"
@@ -78,13 +78,13 @@
           <input
             type="text"
             id="history-search"
-            placeholder="Geçmişte ara..."
+            placeholder="Search history..."
             class="search-input"
           />
         </div>
         <div class="filter-container">
           <select id="language-filter" class="filter-select">
-            <option value="">Tüm diller</option>
+            <option value="">All languages</option>
             <option value="tr">🇹🇷 Türkçe</option>
             <option value="en">🇺🇸 English</option>
             <option value="es">🇪🇸 Español</option>
@@ -110,21 +110,21 @@
         <!-- Empty State -->
         <div id="empty-state" class="empty-state" style="display: none">
           <div class="empty-icon">📝</div>
-          <h3 class="empty-title">Henüz çeviri geçmişi yok</h3>
-          <p class="empty-description">İlk çevirinizi yapın ve burada görün!</p>
+          <h3 class="empty-title">No translation history yet</h3>
+          <p class="empty-description">Make your first translation and it will appear here!</p>
         </div>
 
         <!-- Loading State -->
         <div id="loading-state" class="loading-state">
           <div class="loading-spinner"></div>
-          <span>Geçmiş yükleniyor...</span>
+          <span>Loading history...</span>
         </div>
       </div>
 
       <!-- Footer -->
       <div class="history-footer">
         <div class="footer-info">
-          <span id="storage-info">Yerel depolama kullanılıyor</span>
+          <span id="storage-info">Using local storage</span>
         </div>
         <div class="footer-actions">
           <button id="export-history-btn" class="action-btn export-btn">
@@ -140,7 +140,7 @@
               <polyline points="7,10 12,15 17,10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Dışa Aktar
+            Export
           </button>
         </div>
       </div>
@@ -169,7 +169,7 @@
           <div class="item-actions">
             <button
               class="item-action-btn favorite-btn"
-              title="Favorilere ekle/çıkar"
+              title="Add to/remove from favorites"
             >
               <svg
                 width="14"
@@ -184,7 +184,7 @@
                 ></path>
               </svg>
             </button>
-            <button class="item-action-btn copy-btn" title="Kopyala">
+            <button class="item-action-btn copy-btn" title="Copy">
               <svg
                 width="14"
                 height="14"
@@ -199,7 +199,7 @@
                 ></path>
               </svg>
             </button>
-            <button class="item-action-btn delete-btn" title="Sil">
+            <button class="item-action-btn delete-btn" title="Delete">
               <svg
                 width="14"
                 height="14"
@@ -218,11 +218,11 @@
         </div>
         <div class="item-content">
           <div class="original-text">
-            <div class="text-label">Orijinal Metin:</div>
+            <div class="text-label">Original Text:</div>
             <div class="text-content"></div>
           </div>
           <div class="translated-text">
-            <div class="text-label">Çeviri:</div>
+            <div class="text-label">Translation:</div>
             <div class="text-content"></div>
           </div>
         </div>
@@ -233,7 +233,7 @@
           </div>
           <div class="item-tags">
             <span class="tag favorite-tag" style="display: none"
-              >⭐ Favori</span
+              >⭐ Favorite</span>
             >
           </div>
         </div>

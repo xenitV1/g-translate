@@ -1,6 +1,6 @@
 /**
  * Gemini Translate Popup Logic
- * Popup arayüzü için JavaScript fonksiyonları
+ * JavaScript functions for the popup interface
  */
 
 class PopupController {
@@ -13,14 +13,14 @@ class PopupController {
   }
 
   /**
-   * Background'a mesaj gönder
+   * Send message to background
    */
   async sendMessageToBackground(message) {
     return new Promise((resolve, reject) => {
       const compatibilityLayer = window.compatibilityLayer || chrome;
 
       if (!compatibilityLayer || !compatibilityLayer.runtime) {
-        reject(new Error("Browser API mevcut değil"));
+        reject(new Error("Browser API not available"));
         return;
       }
 
@@ -35,36 +35,36 @@ class PopupController {
   }
 
   /**
-   * Popup'ı başlat
+   * Initialize popup
    */
   async init() {
     try {
-      // DOM elementlerini al
+      // Get DOM elements
       this.elements = this.getElements();
 
-      // API handler background'da yönetiliyor
+      // API handler managed in background
 
-      // Ayarları yükle
+      // Load settings
       await this.loadSettings();
 
-      // Event listener'ları ekle
+      // Attach event listeners
       this.attachEventListeners();
 
-      // API durumunu kontrol et
+      // Check API status
       await this.checkAPIStatus();
 
-      // Varsayılan hedef dili ayarla
+      // Set default target language
       this.setDefaultTargetLanguage();
 
-      console.log("Popup başlatıldı");
+      console.log("Popup initialized");
     } catch (error) {
-      console.error("Popup başlatma hatası:", error);
-      this.showError("Popup başlatılamadı");
+      console.error("Popup initialization error:", error);
+      this.showError("Popup could not be initialized");
     }
   }
 
   /**
-   * DOM elementlerini al
+   * Get DOM elements
    */
   getElements() {
     return {
@@ -107,7 +107,7 @@ class PopupController {
   }
 
   /**
-   * Event listener'ları ekle
+   * Attach event listeners
    */
   attachEventListeners() {
     // Text input events
@@ -166,7 +166,7 @@ class PopupController {
   }
 
   /**
-   * Ayarları yükle
+   * Load settings
    */
   async loadSettings() {
     try {
@@ -180,18 +180,18 @@ class PopupController {
         this.settings = APP_CONSTANTS.DEFAULT_SETTINGS;
       }
 
-      // Hedef dili ayarla
+      // Set target language
       if (this.settings.targetLanguage) {
         this.elements.targetLanguage.value = this.settings.targetLanguage;
       }
     } catch (error) {
-      console.error("Ayarlar yükleme hatası:", error);
+      console.error("Settings loading error:", error);
       this.settings = APP_CONSTANTS.DEFAULT_SETTINGS;
     }
   }
 
   /**
-   * Ayarları kaydet
+   * Save settings
    */
   async saveSettings() {
     try {
@@ -200,12 +200,12 @@ class PopupController {
         data: this.settings,
       });
     } catch (error) {
-      console.error("Ayarlar kaydetme hatası:", error);
+      console.error("Settings saving error:", error);
     }
   }
 
   /**
-   * API durumunu kontrol et
+   * Check API status
    */
   async checkAPIStatus() {
     try {
@@ -214,21 +214,21 @@ class PopupController {
       });
 
       if (response.success && response.data) {
-        this.elements.apiStatus.textContent = `${response.data.name} aktif`;
+        this.elements.apiStatus.textContent = `${response.data.name} active`;
         this.elements.apiStatus.style.color = "var(--success-color)";
       } else {
-        this.elements.apiStatus.textContent = "API seçilmemiş";
+        this.elements.apiStatus.textContent = "API not selected";
         this.elements.apiStatus.style.color = "var(--warning-color)";
       }
     } catch (error) {
-      console.error("API durumu kontrol hatası:", error);
-      this.elements.apiStatus.textContent = "API bağlantısı hatası";
+      console.error("API status check error:", error);
+      this.elements.apiStatus.textContent = "API connection error";
       this.elements.apiStatus.style.color = "var(--error-color)";
     }
   }
 
   /**
-   * Varsayılan hedef dili ayarla
+   * Set default target language
    */
   setDefaultTargetLanguage() {
     if (this.settings && this.settings.targetLanguage) {
@@ -290,16 +290,16 @@ class PopupController {
   }
 
   /**
-   * Otomatik dil tespiti
+   * Automatic language detection
    */
   async autoDetectLanguage(text) {
     if (!text.trim() || text.length < 3) {
-      this.updateDetectionIndicator("Kaynak dil tespit edilecek", "auto");
+      this.updateDetectionIndicator("Source language will be detected", "auto");
       return;
     }
 
     try {
-      this.updateDetectionIndicator("Dil tespit ediliyor...", "detecting");
+      this.updateDetectionIndicator("Detecting language...", "detecting");
 
       const response = await this.sendMessageToBackground({
         type: APP_CONSTANTS.MESSAGE_TYPES.DETECT_LANGUAGE,
@@ -310,23 +310,23 @@ class PopupController {
         const detectedLang = response.data;
         if (detectedLang && detectedLang.code !== "auto") {
           this.updateDetectionIndicator(
-            `Kaynak dil: ${detectedLang.name}`,
+            `Source language: ${detectedLang.name}`,
             detectedLang.code,
           );
         } else {
-          this.updateDetectionIndicator("Kaynak dil belirsiz", "unknown");
+          this.updateDetectionIndicator("Source language unclear", "unknown");
         }
       } else {
-        this.updateDetectionIndicator("Dil tespiti başarısız", "error");
+        this.updateDetectionIndicator("Language detection failed", "error");
       }
     } catch (error) {
-      console.error("Dil tespiti hatası:", error);
-      this.updateDetectionIndicator("Dil tespiti başarısız", "error");
+      console.error("Language detection error:", error);
+      this.updateDetectionIndicator("Language detection failed", "error");
     }
   }
 
   /**
-   * Dil tespiti göstergesini güncelle
+   * Update language detection indicator
    */
   updateDetectionIndicator(message, status) {
     const detectedLanguage =
@@ -350,49 +350,49 @@ class PopupController {
   }
 
   /**
-   * Metin temizle
+   * Clear text
    */
   clearText() {
     this.elements.textInput.value = "";
     this.updateCharCount("");
     this.updateTranslateButton();
-    this.updateDetectionIndicator("Kaynak dil tespit edilecek", "auto");
+    this.updateDetectionIndicator("Source language will be detected", "auto");
     this.hideAllSections();
     this.elements.textInput.focus();
   }
 
   /**
-   * Dil değişimi işleyici
+   * Language change handler
    */
   handleLanguageChange(event) {
     const targetLanguage = event.target.value;
 
-    // Ayarları güncelle
+    // Update settings
     if (this.settings) {
       this.settings.targetLanguage = targetLanguage;
       this.saveSettings();
     }
 
-    // Eğer çeviri yapılmışsa, yeni dil ile tekrar çevir
+    // If translation was done, translate again with new language
     if (this.currentTranslation) {
       this.translateText();
     }
   }
 
   /**
-   * Çeviri işlemi
+   * Translation process
    */
   async translateText() {
     const text = this.elements.textInput.value.trim();
     const targetLanguage = this.elements.targetLanguage.value;
 
     if (!text || text.length === 0) {
-      this.showError("Lütfen çevrilecek metni girin");
+      this.showError("Please enter text to translate");
       return;
     }
 
     if (text.length > APP_CONSTANTS.MAX_TEXT_LENGTH) {
-      this.showError("Metin çok uzun. Maksimum 5000 karakter olabilir.");
+      this.showError("Text is too long. Maximum 5000 characters allowed.");
       return;
     }
 
@@ -400,10 +400,10 @@ class PopupController {
       this.setLoadingState(true);
       this.hideAllSections();
 
-      this.elements.loadingText.textContent = "Çevriliyor...";
+      this.elements.loadingText.textContent = "Translating...";
       this.elements.loadingSection.style.display = "flex";
 
-      // Çeviri işlemi - background'a mesaj gönder
+      // Translation process - send message to background
       const response = await this.sendMessageToBackground({
         type: APP_CONSTANTS.MESSAGE_TYPES.TRANSLATE_TEXT,
         data: {
@@ -414,41 +414,41 @@ class PopupController {
       });
 
       if (!response.success) {
-        throw new Error(response.error || "Çeviri başarısız oldu");
+        throw new Error(response.error || "Translation failed");
       }
 
       const result = response.data;
 
-      // Sonucu göster
+      // Show result
       this.showTranslationResult(result);
 
-      // Geçmişe kaydet
+      // Save to history
       await this.saveToHistory(result);
     } catch (error) {
-      console.error("Çeviri hatası:", error);
-      this.showError(error.message || "Çeviri başarısız oldu");
+      console.error("Translation error:", error);
+      this.showError(error.message || "Translation failed");
     } finally {
       this.setLoadingState(false);
     }
   }
 
   /**
-   * Çeviri sonucunu göster
+   * Show translation result
    */
   showTranslationResult(result) {
     this.currentTranslation = result;
 
-    // Önce tüm bölümleri gizle (özellikle loading section'ı)
+    // First hide all sections (especially loading section)
     this.hideAllSections();
 
-    // Dil bilgilerini güncelle
+    // Update language information
     this.elements.sourceLang.textContent = result.sourceLanguage.name;
     this.elements.targetLang.textContent = result.targetLanguage.name;
 
-    // Çeviri metnini göster
+    // Show translated text
     this.elements.translatedText.textContent = result.translatedText;
 
-    // Güven skorunu göster
+    // Show confidence score
     if (result.confidence && this.settings.showConfidence) {
       this.elements.confidenceScore.style.display = "flex";
       this.elements.confidenceScore.querySelector(
@@ -456,7 +456,7 @@ class PopupController {
       ).textContent = `${Math.round(result.confidence * 100)}%`;
     }
 
-    // Sonuç bölümünü göster
+    // Show result section
     this.elements.resultSection.style.display = "block";
     this.elements.resultSection.classList.add("fade-in");
   }
@@ -465,7 +465,7 @@ class PopupController {
    * Hata göster
    */
   showError(message) {
-    // Önce tüm bölümleri gizle (özellikle loading section'ı)
+    // First hide all sections (especially loading section)
     this.hideAllSections();
 
     this.elements.errorMessage.textContent = message;
@@ -492,12 +492,12 @@ class PopupController {
     if (loading) {
       this.elements.translateBtn.innerHTML = `
                 <div class="loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
-                <span>Çevriliyor...</span>
+                <span>Translating...</span>
             `;
     } else {
       this.elements.translateBtn.innerHTML = `
                 <span class="btn-icon">🔤</span>
-                <span class="btn-text">Çevir</span>
+                <span class="btn-text">Translate</span>
             `;
     }
 
@@ -518,7 +518,7 @@ class PopupController {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20,6 9,17 4,12"></polyline>
                 </svg>
-                <span>Kopyalandı!</span>
+                <span>Copied!</span>
             `;
       this.elements.copyBtn.style.color = "var(--success-color)";
 
@@ -527,13 +527,13 @@ class PopupController {
         this.elements.copyBtn.style.color = "";
       }, 2000);
     } catch (error) {
-      console.error("Kopyalama hatası:", error);
-      this.showError("Kopyalama başarısız oldu");
+      console.error("Copy error:", error);
+      this.showError("Copy failed");
     }
   }
 
   /**
-   * Çeviriyi kaydet
+   * Save translation
    */
   async saveTranslation() {
     if (!this.currentTranslation) return;
@@ -547,7 +547,7 @@ class PopupController {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20,6 9,17 4,12"></polyline>
                 </svg>
-                <span>Kaydedildi!</span>
+                <span>Saved!</span>
             `;
       this.elements.saveBtn.style.color = "var(--success-color)";
 
@@ -556,13 +556,13 @@ class PopupController {
         this.elements.saveBtn.style.color = "";
       }, 2000);
     } catch (error) {
-      console.error("Kaydetme hatası:", error);
-      this.showError("Kaydetme başarısız oldu");
+      console.error("Save error:", error);
+      this.showError("Save failed");
     }
   }
 
   /**
-   * Geçmişe kaydet
+   * Save to history
    */
   async saveToHistory(translation) {
     try {
@@ -571,15 +571,15 @@ class PopupController {
         data: translation,
       });
     } catch (error) {
-      console.error("Geçmişe kaydetme hatası:", error);
+      console.error("History save error:", error);
     }
   }
 
   /**
-   * Klavye olayları
+   * Keyboard events
    */
   handleKeyboard(event) {
-    // Ctrl+Enter veya Enter ile çevir
+    // Translate with Ctrl+Enter or Enter
     if ((event.ctrlKey && event.key === "Enter") || event.key === "Enter") {
       event.preventDefault();
       if (!this.isTranslating && this.elements.textInput.value.trim()) {
@@ -587,39 +587,39 @@ class PopupController {
       }
     }
 
-    // Escape ile temizle veya popup'ı kapat
+    // Clear with Escape or close popup
     if (event.key === "Escape") {
       if (this.elements.textInput.value.trim()) {
         this.clearText();
       } else {
-        // Popup'ı kapat
+        // Close popup
         window.close();
       }
     }
 
-    // Ctrl+Shift+H ile geçmişi aç
+    // Open history with Ctrl+Shift+H
     if (event.ctrlKey && event.shiftKey && event.key === "H") {
       event.preventDefault();
       this.openHistory();
     }
 
-    // Ctrl+Shift+S ile ayarları aç
+    // Open settings with Ctrl+Shift+S
     if (event.ctrlKey && event.shiftKey && event.key === "S") {
       event.preventDefault();
       this.openSettings();
     }
 
-    // Ctrl+A ile tümünü seç (textarea içindeyse)
+    // Select all with Ctrl+A (if in textarea)
     if (
       event.ctrlKey &&
       event.key === "a" &&
       event.target === this.elements.textInput
     ) {
-      // Default davranışı izin ver
+      // Allow default behavior
       return;
     }
 
-    // Ctrl+Shift+T ile hızlı çeviri (seçili metin varsa)
+    // Quick translate with Ctrl+Shift+T (if text selected)
     if (event.ctrlKey && event.shiftKey && event.key === "T") {
       event.preventDefault();
       this.handleQuickTranslate();
@@ -627,17 +627,17 @@ class PopupController {
   }
 
   /**
-   * Hızlı çeviri işleyici
+   * Quick translate handler
    */
   async handleQuickTranslate() {
     try {
-      // Eğer metin varsa, direkt çevir
+      // If text exists, translate directly
       if (this.elements.textInput.value.trim()) {
         await this.translateText();
         return;
       }
 
-      // Eğer metin yoksa, seçili metni al
+      // If no text, get selected text
       const selectedText = await this.getSelectedText();
       if (selectedText) {
         this.elements.textInput.value = selectedText;
@@ -646,33 +646,33 @@ class PopupController {
         this.autoDetectLanguage(selectedText);
         await this.translateText();
       } else {
-        this.showError("Çevrilecek metin bulunamadı");
+        this.showError("No text found to translate");
       }
     } catch (error) {
-      console.error("Hızlı çeviri hatası:", error);
-      this.showError("Hızlı çeviri başarısız oldu");
+      console.error("Quick translate error:", error);
+      this.showError("Quick translate failed");
     }
   }
 
   /**
-   * Seçili metni al
+   * Get selected text
    */
   async getSelectedText() {
     try {
-      // Content script'ten seçili metni al - background üzerinden
+      // Get selected text from content script - via background
       const response = await this.sendMessageToBackground({
         type: "GET_SELECTED_TEXT",
       });
 
       return response?.text || null;
     } catch (error) {
-      console.error("Seçili metin alma hatası:", error);
+      console.error("Selected text retrieval error:", error);
       return null;
     }
   }
 
   /**
-   * Textarea otomatik boyutlandırma
+   * Auto-resize textarea
    */
   autoResizeTextarea() {
     const textarea = this.elements.textInput;
@@ -681,38 +681,38 @@ class PopupController {
   }
 
   /**
-   * Ayarları aç
+   * Open settings
    */
   openSettings() {
-    // Ayarlar sayfasını aç - Chrome API'sini doğrudan kullan
+    // Open settings page - use Chrome API directly
     if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
       chrome.runtime.openOptionsPage();
     } else {
-      // Fallback: options sayfasını manuel olarak aç
+      // Fallback: open options page manually
       const optionsUrl = chrome.runtime.getURL("options/options.html");
       window.open(optionsUrl, "_blank");
     }
   }
 
   /**
-   * Geçmişi aç
+   * Open history
    */
   openHistory() {
     try {
-      // Geçmiş popup'ını aç
+      // Open history popup
       const compatibilityLayer = window.compatibilityLayer || chrome;
       if (
         compatibilityLayer.getRuntime &&
         compatibilityLayer.getRuntime().openOptionsPage
       ) {
-        // Yeni tab'da geçmiş popup'ını aç
+        // Open history popup in new tab
         window.open(
           "history-popup.html",
           "_blank",
           "width=800,height=600,scrollbars=yes,resizable=yes",
         );
       } else {
-        // Fallback: Yeni window
+        // Fallback: New window
         window.open(
           "history-popup.html",
           "_blank",
@@ -720,18 +720,18 @@ class PopupController {
         );
       }
     } catch (error) {
-      console.error("Geçmiş açma hatası:", error);
-      this.showError("Geçmiş açılamadı");
+      console.error("History opening error:", error);
+      this.showError("History could not be opened");
     }
   }
 
   /**
-   * Yardım aç
+   * Open help
    */
   openHelp() {
-    // Yardım sayfasını aç
+    // Open help page
     window.open(
-      "https://github.com/your-username/gemini-translate-extension",
+      "https://github.com/xenitV1/g-translate",
       "_blank",
     );
   }
