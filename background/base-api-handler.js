@@ -49,9 +49,15 @@ class BaseAPIHandler {
     async saveApiKey(apiKey) {
         try {
             const storageKey = `${this.constructor.name.toLowerCase()}_api_key`;
-            await chrome.storage.local.set({
-                [storageKey]: apiKey
-            });
+            const compatibilityLayer = self.compatibilityLayer || chrome;
+
+            if (compatibilityLayer && compatibilityLayer.storage && compatibilityLayer.storage.local) {
+                await compatibilityLayer.storage.local.set({
+                    [storageKey]: apiKey
+                });
+            } else {
+                console.error('Storage API mevcut değil');
+            }
         } catch (error) {
             console.error('API key kaydetme hatası:', error);
         }
@@ -63,8 +69,15 @@ class BaseAPIHandler {
     async loadApiKey() {
         try {
             const storageKey = `${this.constructor.name.toLowerCase()}_api_key`;
-            const result = await chrome.storage.local.get([storageKey]);
-            return result[storageKey] || null;
+            const compatibilityLayer = self.compatibilityLayer || chrome;
+
+            if (compatibilityLayer && compatibilityLayer.storage && compatibilityLayer.storage.local) {
+                const result = await compatibilityLayer.storage.local.get([storageKey]);
+                return result[storageKey] || null;
+            } else {
+                console.error('Storage API mevcut değil');
+                return null;
+            }
         } catch (error) {
             console.error('API key yükleme hatası:', error);
             return null;
