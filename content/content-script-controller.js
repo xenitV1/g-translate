@@ -160,14 +160,7 @@ class ContentScriptController {
         console.warn("SelectionHandler not available");
       }
 
-      // Instant translator'ı başlat (global olarak mevcut olmalı)
-      console.log("ContentScriptController: InstantTranslator kontrol ediliyor", typeof window !== "undefined", !!window.InstantTranslator);
-      if (typeof window !== "undefined" && window.InstantTranslator) {
-        this.instantTranslator = new window.InstantTranslator();
-        console.log("ContentScriptController: InstantTranslator başlatıldı");
-      } else {
-        console.warn("InstantTranslator not available");
-      }
+      // Instant translator removed - using only selection handler
 
       // Context menu'yu başlat (global olarak mevcut olmalı)
       if (typeof window !== "undefined" && window.ContextMenuHandler) {
@@ -190,16 +183,12 @@ class ContentScriptController {
       this.setupBackgroundCommunication();
 
       this.isInitialized = true;
-      console.log("Content script başlatıldı");
     } catch (error) {
       console.error("Component başlatma hatası:", error);
 
-      // Extension context kaybı durumunda sayfayı yenile
+      // Extension context loss - let user refresh manually
       if (error.message.includes("Extension context invalidated")) {
-        console.warn(
-          "Extension context kaybı tespit edildi, sayfa yenileniyor...",
-        );
-        setTimeout(() => window.location.reload(), 1000);
+        // Context loss detected - user can refresh manually
       }
     }
   }
@@ -278,38 +267,18 @@ class ContentScriptController {
         timestamp: Date.now(),
       };
 
-      // Instant translation popup'ı göster
-      this.showInstantTranslationPopup();
+      // Don't show popup here - SelectionHandler will show translate button
+      // Popup will be triggered when button is clicked
     }
   }
 
-  /**
-   * Instant translation popup'ı göster
-   */
-  showInstantTranslationPopup() {
-    console.log("ContentScriptController: showInstantTranslationPopup çağrıldı", this.currentSelection);
-    
-    if (!this.currentSelection || this.isTranslating) {
-      console.log("ContentScriptController: popup gösterilmedi - selection:", !!this.currentSelection, "translating:", this.isTranslating);
-      return;
-    }
-
-    try {
-      console.log("ContentScriptController: instantTranslator var mı:", !!this.instantTranslator);
-      // Popup'ı oluştur ve göster
-      this.instantTranslator.showPopup(this.currentSelection);
-    } catch (error) {
-      console.error("Instant popup gösterme hatası:", error);
-    }
-  }
 
   /**
-   * Mevcut seçimi temizle
+   * Clear current selection
    */
   clearCurrentSelection() {
     if (this.currentSelection) {
-      // Popup'ları kapat
-      this.instantTranslator.hidePopup();
+      // Hide overlays (instant translator removed)
       this.translationOverlay.hideOverlay();
 
       this.currentSelection = null;
@@ -317,14 +286,11 @@ class ContentScriptController {
   }
 
   /**
-   * Document click işleyici
+   * Handle document click
    */
   handleDocumentClick(event) {
-    // Popup dışına tıklandığında kapat
-    if (
-      !event.target.closest(".gemini-translate-popup") &&
-      !event.target.closest(".gemini-translate-overlay")
-    ) {
+    // Close selection when clicking outside
+    if (!event.target.closest(".gemini-translate-overlay")) {
       this.clearCurrentSelection();
     }
   }
@@ -383,28 +349,20 @@ class ContentScriptController {
   }
 
   /**
-   * Scroll olayı işleyici
+   * Handle scroll event
    */
   handleScroll() {
-    // Popup pozisyonunu güncelle
-    if (this.instantTranslator && this.instantTranslator.isVisible()) {
-      this.instantTranslator.updatePosition();
-    }
-
+    // Update overlay positions (instant translator removed)
     if (this.translationOverlay && this.translationOverlay.isOverlayVisible()) {
       this.translationOverlay.updatePosition();
     }
   }
 
   /**
-   * Resize olayı işleyici
+   * Handle resize event
    */
   handleResize() {
-    // Popup pozisyonunu güncelle
-    if (this.instantTranslator && this.instantTranslator.isVisible()) {
-      this.instantTranslator.updatePosition();
-    }
-
+    // Update overlay positions (instant translator removed)
     if (this.translationOverlay && this.translationOverlay.isOverlayVisible()) {
       this.translationOverlay.updatePosition();
     }
@@ -537,7 +495,7 @@ class ContentScriptController {
    */
   handleContextLoss() {
     console.log("Content script controller: Extension context kaybı handle ediliyor...");
-    
+
     // Tüm popup'ları kapat
     if (this.instantTranslator) {
       this.instantTranslator.hidePopup();
@@ -545,15 +503,9 @@ class ContentScriptController {
     if (this.translationOverlay) {
       this.translationOverlay.hideOverlay();
     }
-    
-    // Kullanıcıya bildirim göster
+
+    // Kullanıcıya bildirim göster (sayfa yenilemeyi kullanıcıya bırak)
     this.showContextLossNotification();
-    
-    // Sayfayı yenile (3 saniye sonra)
-    setTimeout(() => {
-      console.log("Extension context kaybı nedeniyle sayfa yenileniyor...");
-      window.location.reload();
-    }, 3000);
   }
 
   /**
@@ -590,7 +542,7 @@ class ContentScriptController {
         <span style="font-size: 16px;">⚠️</span>
         <div>
           <div style="font-weight: 600; margin-bottom: 4px;">Extension Güncellendi</div>
-          <div style="font-size: 12px; opacity: 0.9;">Sayfa 3 saniye içinde yenilenecek...</div>
+          <div style="font-size: 12px; opacity: 0.9;">Lütfen sayfayı manuel olarak yenileyin</div>
         </div>
       </div>
     `;

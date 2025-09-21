@@ -1,6 +1,6 @@
 /**
  * Selection Handler
- * Metin seçimi algılama ve yönetimi
+ * Text selection detection and management
  */
 
 class SelectionHandler {
@@ -16,7 +16,7 @@ class SelectionHandler {
   }
 
   /**
-   * Selection handler'ı başlat
+   * Initialize selection handler
    */
   init() {
     this.attachEventListeners();
@@ -24,7 +24,7 @@ class SelectionHandler {
   }
 
   /**
-   * Event listener'ları ekle
+   * Attach event listeners
    */
   attachEventListeners() {
     // Mouse events
@@ -46,32 +46,32 @@ class SelectionHandler {
   }
 
   /**
-   * Mouse up olayı
+   * Handle mouse up event
    */
   handleMouseUp(event) {
     if (!this.isEnabled) return;
 
-    // Kısa gecikme ile seçimi kontrol et
+    // Check selection with short delay
     this.debounceSelection(() => {
       this.processSelection();
     });
   }
 
   /**
-   * Mouse down olayı
+   * Handle mouse down event
    */
   handleMouseDown(event) {
-    // Yeni seçim başladığında önceki seçimi temizle
+    // Clear previous selection when new selection starts
     this.clearCurrentSelection();
   }
 
   /**
-   * Key up olayı
+   * Handle key up event
    */
   handleKeyUp(event) {
     if (!this.isEnabled) return;
 
-    // Shift + Arrow keys ile seçim
+    // Shift + Arrow keys for selection
     if (event.shiftKey && this.isArrowKey(event.key)) {
       this.debounceSelection(() => {
         this.processSelection();
@@ -80,17 +80,17 @@ class SelectionHandler {
   }
 
   /**
-   * Key down olayı
+   * Handle key down event
    */
   handleKeyDown(event) {
-    // Escape ile seçimi temizle
+    // Clear selection with Escape
     if (event.key === "Escape") {
       this.clearCurrentSelection();
     }
   }
 
   /**
-   * Touch end olayı (mobile)
+   * Handle touch end event (mobile)
    */
   handleTouchEnd(event) {
     if (!this.isEnabled) return;
@@ -101,7 +101,7 @@ class SelectionHandler {
   }
 
   /**
-   * Selection change olayı
+   * Handle selection change event
    */
   handleSelectionChange() {
     if (!this.isEnabled) return;
@@ -112,7 +112,7 @@ class SelectionHandler {
   }
 
   /**
-   * Debounce ile seçim işleme
+   * Debounce selection processing
    */
   debounceSelection(callback) {
     clearTimeout(this.selectionTimeout);
@@ -120,40 +120,41 @@ class SelectionHandler {
   }
 
   /**
-   * Seçimi işle
+   * Process selection
    */
   processSelection() {
     const selection = window.getSelection();
     const selectedText = selection.toString().trim();
 
-    // Önceki seçimi temizle
+    // Clear previous selection
     this.clearCurrentSelection();
 
-    // Yeni seçimi kontrol et
+    // Check new selection
     if (this.isValidSelection(selectedText)) {
       this.createSelection(selection, selectedText);
+      // Translate button removed - selection handler only
     }
   }
 
   /**
-   * Geçerli seçim kontrolü
+   * Validate selection
    */
   isValidSelection(text) {
     if (!text || text.length === 0) return false;
     if (text.length < this.minSelectionLength) return false;
     if (text.length > this.maxSelectionLength) return false;
 
-    // Sadece metin içeriği (HTML elementleri değil)
+    // Only text content (not HTML elements)
     if (text.includes("<") && text.includes(">")) return false;
 
-    // Boş karakterlerden oluşan seçimler
+    // Selections consisting only of whitespace
     if (/^\s+$/.test(text)) return false;
 
     return true;
   }
 
   /**
-   * Seçim oluştur
+   * Create selection
    */
   createSelection(selection, text) {
     try {
@@ -171,27 +172,28 @@ class SelectionHandler {
         endContainer: range.endContainer,
       };
 
-      // Seçim event'ini tetikle
-      this.triggerSelectionEvent();
+      // Don't trigger selection event here - only show translate button
+      // Full popup will be triggered when button is clicked
     } catch (error) {
-      console.error("Seçim oluşturma hatası:", error);
+      console.error("Selection creation error:", error);
     }
   }
 
   /**
-   * Mevcut seçimi temizle
+   * Clear current selection
    */
   clearCurrentSelection() {
     if (this.currentSelection) {
-      // Seçim temizleme event'ini tetikle
+      // Trigger selection clear event
       this.triggerClearSelectionEvent();
 
       this.currentSelection = null;
+      // Translate button removed
     }
   }
 
   /**
-   * Seçim event'ini tetikle
+   * Trigger selection event
    */
   triggerSelectionEvent() {
     const event = new CustomEvent("geminiTextSelected", {
@@ -206,7 +208,7 @@ class SelectionHandler {
   }
 
   /**
-   * Seçim temizleme event'ini tetikle
+   * Trigger selection clear event
    */
   triggerClearSelectionEvent() {
     const event = new CustomEvent("geminiTextCleared", {
@@ -219,29 +221,30 @@ class SelectionHandler {
   }
 
   /**
-   * Arrow key kontrolü
+   * Check if key is arrow key
    */
   isArrowKey(key) {
     return ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(key);
   }
 
+
   /**
-   * Seçim stillerini ayarla
+   * Setup selection styles
    */
   setupSelectionStyles() {
-    // Seçim rengini özelleştir
+    // Customize selection color
     const style = document.createElement("style");
     style.textContent = `
             ::selection {
                 background-color: rgba(66, 133, 244, 0.2);
                 color: inherit;
             }
-            
+
             ::-moz-selection {
                 background-color: rgba(66, 133, 244, 0.2);
                 color: inherit;
             }
-            
+
             .gemini-selection-highlight {
                 background-color: rgba(66, 133, 244, 0.15);
                 border-radius: 2px;
@@ -253,7 +256,7 @@ class SelectionHandler {
   }
 
   /**
-   * Seçimi vurgula
+   * Highlight selection
    */
   highlightSelection() {
     if (!this.currentSelection) return;
@@ -265,12 +268,12 @@ class SelectionHandler {
 
       range.surroundContents(span);
     } catch (error) {
-      console.error("Seçim vurgulama hatası:", error);
+      console.error("Selection highlighting error:", error);
     }
   }
 
   /**
-   * Vurguyu kaldır
+   * Remove highlight
    */
   removeHighlight() {
     const highlights = document.querySelectorAll(".gemini-selection-highlight");
@@ -285,7 +288,7 @@ class SelectionHandler {
   }
 
   /**
-   * Seçim pozisyonunu güncelle
+   * Update selection position
    */
   updateSelectionPosition() {
     if (!this.currentSelection) return;
@@ -295,41 +298,42 @@ class SelectionHandler {
       const rect = range.getBoundingClientRect();
 
       this.currentSelection.rect = rect;
+      // Translate button removed
     } catch (error) {
-      console.error("Seçim pozisyon güncelleme hatası:", error);
+      console.error("Selection position update error:", error);
     }
   }
 
   /**
-   * Seçim metnini al
+   * Get selected text
    */
   getSelectedText() {
     return this.currentSelection ? this.currentSelection.text : "";
   }
 
   /**
-   * Seçim pozisyonunu al
+   * Get selection rect
    */
   getSelectionRect() {
     return this.currentSelection ? this.currentSelection.rect : null;
   }
 
   /**
-   * Seçim var mı kontrol et
+   * Check if selection exists
    */
   hasSelection() {
     return this.currentSelection !== null;
   }
 
   /**
-   * Seçim uzunluğunu al
+   * Get selection length
    */
   getSelectionLength() {
     return this.currentSelection ? this.currentSelection.text.length : 0;
   }
 
   /**
-   * Seçim ayarlarını güncelle
+   * Update selection settings
    */
   updateSettings(settings) {
     if (settings.minSelectionLength) {
@@ -346,7 +350,7 @@ class SelectionHandler {
   }
 
   /**
-   * Handler'ı etkinleştir/devre dışı bırak
+   * Enable/disable handler
    */
   setEnabled(enabled) {
     this.isEnabled = enabled;
@@ -357,10 +361,10 @@ class SelectionHandler {
   }
 
   /**
-   * Selection handler'ı temizle
+   * Clean up selection handler
    */
   destroy() {
-    // Event listener'ları kaldır
+    // Remove event listeners
     document.removeEventListener("mouseup", this.handleMouseUp);
     document.removeEventListener("mousedown", this.handleMouseDown);
     document.removeEventListener("keyup", this.handleKeyUp);
@@ -368,13 +372,13 @@ class SelectionHandler {
     document.removeEventListener("touchend", this.handleTouchEnd);
     document.removeEventListener("selectionchange", this.handleSelectionChange);
 
-    // Timeout'ları temizle
+    // Clear timeouts
     clearTimeout(this.selectionTimeout);
 
-    // Seçimi temizle
+    // Clear selection
     this.clearCurrentSelection();
 
-    // Vurguyu kaldır
+    // Remove highlight
     this.removeHighlight();
   }
 }
