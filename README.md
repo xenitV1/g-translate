@@ -75,16 +75,19 @@ Bu proje açık kaynak olsa da, API anahtarları **hiçbir zaman** kod dosyalar�
 ## API Desteği
 
 ### Google Gemini
+
 - Ücretsiz tier mevcut
 - Güçlü çeviri kalitesi
 - 50+ dil desteği
 
 ### OpenAI GPT
+
 - GPT-3.5-turbo ve GPT-4 modelleri
 - Ücretli API
 - En yüksek çeviri kalitesi
 
 ### Anthropic Claude
+
 - Claude 3 modelleri
 - Ücretli API
 - Güvenli ve tutarlı çeviriler
@@ -134,18 +137,21 @@ npm test
 ## Güvenlik
 
 ### API Anahtarları
+
 - ✅ **Tarayıcı localStorage'da saklanır** (şifrelenmemiş)
 - ✅ **Hiçbir sunucuya gönderilmez**
 - ✅ **Sadece çeviri işlemleri için kullanılır**
 - ✅ **Koddan tamamen ayrıştırılmıştır**
 
 ### Güvenlik Önlemleri
+
 - 🔒 **.gitignore ile hassas dosyalar korunur**
 - 🛡️ **API anahtarları kodda bulunmaz**
 - ⚠️ **Console uyarıları şüpheli durumları yakalar**
 - 🚫 **Güvenlik riski taşıyan dosyalar kaldırıldı**
 
 ### Tehlikeli Dosyalar
+
 - ❌ ~~`utils/api-config.js`~~ - **Kaldırıldı** (API anahtarları içeriyordu)
 - ✅ Sadece `constants.js` ve `language-codes.js` utils'ta kaldı
 
@@ -166,15 +172,18 @@ MIT License - bkz. [LICENSE](LICENSE) dosyası
 ### Yaygın Problemler
 
 **API anahtarı çalışmıyor:**
+
 - API anahtarınızın doğru olduğundan emin olun
 - API limitlerinizi kontrol edin
 - Console'da hata mesajlarını inceleyin
 
 **Extension yüklenmiyor:**
+
 - Manifest dosyasının geçerli JSON olduğundan emin olun
 - Tüm gerekli dosyaların mevcut olduğunu kontrol edin
 
 **Çeviri çalışmıyor:**
+
 - İnternet bağlantınızı kontrol edin
 - API durumunu options sayfasından kontrol edin
 

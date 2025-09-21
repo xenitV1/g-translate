@@ -3,15 +3,8 @@
   "name": "G-Translate",
   "version": "1.0.0",
   "description": "Google Gemini API ile güçlü çeviri eklentisi - AI powered translation",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "scripting",
-    "contextMenus"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "permissions": ["activeTab", "storage", "scripting", "contextMenus"],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "G-Translate",
@@ -26,23 +19,25 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "cross-browser/polyfills.js",
-        "utils/constants.js",
-        "utils/language-codes.js",
-        "content/selection-handler.js",
-        "content/instant-translator.js",
-        "content/context-menu.js",
-        "content/translation-overlay.js",
-        "content/content.js"
+        "dist/content-script-controller.js",
+        "dist/selection-handler.js",
+        "dist/instant-translator.js",
+        "dist/context-menu.js",
+        "dist/translation-overlay.js",
+        "dist/content-main.js"
       ],
       "css": ["content/content.css"],
       "run_at": "document_end"
     }
   ],
   "background": {
-    "service_worker": "background/background.js"
+    "service_worker": "dist/background.js",
+    "type": "module"
   },
-  "options_page": "options/options.html",
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
   "web_accessible_resources": [
     {
       "resources": ["assets/*", "popup/*"],
@@ -54,28 +49,5 @@
     "32": "assets/icons/icon32.png",
     "48": "assets/icons/icon48.png",
     "128": "assets/icons/icon128.png"
-  },
-  "commands": {
-    "translate-selected": {
-      "suggested_key": {
-        "default": "Ctrl+Z",
-        "mac": "Command+Z"
-      },
-      "description": "Seçili metni çevir / Hızlı çeviri"
-    },
-    "open-history": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+H",
-        "mac": "Command+Shift+H"
-      },
-      "description": "Çeviri geçmişini aç"
-    },
-    "open-settings": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+S",
-        "mac": "Command+Shift+S"
-      },
-      "description": "Ayarları aç"
-    }
   }
 }

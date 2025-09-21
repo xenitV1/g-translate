@@ -10,9 +10,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "package": "npm run build && npm run package:chrome && npm run package:firefox && npm run package:safari",
-    "package:chrome": "zip -r dist/gemini-translate-chrome.zip manifest.json cross-browser popup content background options assets utils -x *.md tests/*",
-    "package:firefox": "zip -r dist/gemini-translate-firefox.zip manifest.firefox.json cross-browser popup content background options assets utils -x *.md tests/*",
-    "package:safari": "zip -r dist/gemini-translate-safari.zip manifest.safari.json cross-browser popup content background options assets utils -x *.md tests/*"
+    "package:chrome": "powershell Compress-Archive -Path manifest.json,cross-browser,popup,content,background,options,assets,utils -DestinationPath dist/gemini-translate-chrome.zip -Force",
+    "package:firefox": "powershell Compress-Archive -Path manifest.firefox.json,cross-browser,popup,content,background,options,assets,utils -DestinationPath dist/gemini-translate-firefox.zip -Force",
+    "package:safari": "powershell Compress-Archive -Path manifest.safari.json,cross-browser,popup,content,background,options,assets,utils -DestinationPath dist/gemini-translate-safari.zip -Force"
   },
   "keywords": [
     "translation",
@@ -29,11 +29,16 @@
     "crypto-js": "^4.2.0"
   },
   "devDependencies": {
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4",
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
     "eslint": "^8.55.0",
+    "jest": "^29.7.0",
     "prettier": "^3.1.0",
-    "jest": "^29.7.0"
+    "style-loader": "^4.0.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   },
   "repository": {
     "type": "git",

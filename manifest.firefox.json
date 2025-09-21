@@ -3,12 +3,7 @@
   "name": "G-Translate",
   "version": "1.0.0",
   "description": "Google Gemini API ile güçlü çeviri eklentisi - AI powered translation",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "contextMenus",
-    "<all_urls>"
-  ],
+  "permissions": ["activeTab", "storage", "contextMenus", "<all_urls>"],
   "browser_action": {
     "default_popup": "popup/popup.html",
     "default_title": "G-Translate",
@@ -22,36 +17,17 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": [
-        "cross-browser/polyfills.js",
-        "utils/constants.js",
-        "utils/language-codes.js",
-        "background/api-handler.js",
-        "content/selection-handler.js",
-        "content/instant-translator.js",
-        "content/context-menu.js",
-        "content/translation-overlay.js",
-        "content/content.js"
-      ],
+      "js": ["content/content.js"],
       "css": ["content/content.css"],
       "run_at": "document_end"
     }
   ],
   "background": {
-    "scripts": [
-      "utils/constants.js",
-      "utils/language-codes.js", 
-      "background/api-handler.js",
-      "background/storage-manager.js",
-      "background/background.js"
-    ],
+    "scripts": ["background/background.js"],
     "persistent": false
   },
   "options_page": "options/options.html",
-  "web_accessible_resources": [
-    "assets/*",
-    "popup/*"
-  ],
+  "web_accessible_resources": ["assets/*", "popup/*"],
   "icons": {
     "16": "assets/icons/icon16.png",
     "32": "assets/icons/icon32.png",
