@@ -509,7 +509,23 @@ class InstantTranslator {
             
         } catch (error) {
             console.error('Dil tespiti hatası:', error);
-            detectionContent.textContent = 'Dil tespiti başarısız';
+
+            // Extension context kaybı durumunda popup'ı kapat
+            if (error.message.includes('Extension context invalidated') ||
+                error.message.includes('context invalidated') ||
+                (error.message && error.message.includes('runtime'))) {
+
+                detectionContent.textContent = 'Extension bağlantısı kesildi';
+                this.showError('Extension yeniden yüklendi. Sayfa yenileniyor...');
+
+                // 2 saniye sonra popup'ı kapat ve sayfayı yenile
+                setTimeout(() => {
+                    this.hidePopup();
+                    window.location.reload();
+                }, 2000);
+            } else {
+                detectionContent.textContent = 'Dil tespiti başarısız';
+            }
         }
     }
 
@@ -544,7 +560,22 @@ class InstantTranslator {
             
         } catch (error) {
             console.error('Çeviri hatası:', error);
-            this.showError('Çeviri işlemi başarısız oldu');
+
+            // Extension context kaybı durumunda popup'ı kapat
+            if (error.message.includes('Extension context invalidated') ||
+                error.message.includes('context invalidated') ||
+                (error.message && error.message.includes('runtime'))) {
+
+                this.showError('Extension yeniden yüklendi. Sayfa yenileniyor...');
+
+                // 2 saniye sonra popup'ı kapat ve sayfayı yenile
+                setTimeout(() => {
+                    this.hidePopup();
+                    window.location.reload();
+                }, 2000);
+            } else {
+                this.showError('Çeviri işlemi başarısız oldu');
+            }
         } finally {
             this.isTranslating = false;
             this.hideLoadingState();
@@ -557,20 +588,15 @@ class InstantTranslator {
     showTranslationResult(translation) {
         const resultDiv = this.popup.querySelector('.translation-result');
         const resultContent = this.popup.querySelector('.result-content');
-
+        
         resultContent.textContent = translation.translatedText;
         resultDiv.style.display = 'block';
-
+        
         // Copy butonunu etkinleştir
         this.popup.querySelector('.copy-btn').disabled = false;
-
+        
         // Auto-hide'ı durdur
         this.clearAutoHide();
-
-        // Popup boyutu değiştiği için pozisyonu güncelle
-        setTimeout(() => {
-            this.positionPopup();
-        }, 100);
     }
 
     /**
@@ -669,19 +695,33 @@ class InstantTranslator {
 
             // Extension context kontrolü
             if (!compatibilityLayer || !compatibilityLayer.runtime) {
-                throw new Error('Extension runtime mevcut değil');
+                throw new Error('Extension context invalidated');
+            }
+
+            // Extension ID kontrolü (context kaybının erken tespiti)
+            if (!compatibilityLayer.runtime.id) {
+                throw new Error('Extension context invalidated');
             }
 
             // Promise ile mesaj gönder
             return new Promise((resolve, reject) => {
-                compatibilityLayer.runtime.sendMessage(message, (response) => {
-                    // Chrome runtime error kontrolü
-                    if (chrome.runtime.lastError) {
-                        reject(new Error(chrome.runtime.lastError.message));
-                    } else {
-                        resolve(response);
-                    }
-                });
+                try {
+                    compatibilityLayer.runtime.sendMessage(message, (response) => {
+                        // Chrome runtime error kontrolü
+                        if (chrome.runtime.lastError) {
+                            // Extension context invalidated kontrolü
+                            if (chrome.runtime.lastError.message.includes('Extension context invalidated')) {
+                                reject(new Error('Extension context invalidated'));
+                            } else {
+                                reject(new Error(chrome.runtime.lastError.message));
+                            }
+                        } else {
+                            resolve(response);
+                        }
+                    });
+                } catch (syncError) {
+                    reject(syncError);
+                }
             });
 
         } catch (error) {
@@ -690,11 +730,12 @@ class InstantTranslator {
             // Extension context invalidated hatası için özel kontrol
             if (error.message.includes('Extension context invalidated') ||
                 error.message.includes('context invalidated')) {
-                console.warn('Extension context kaybı tespit edildi. Sayfa yenileniyor...');
-                // Sayfayı yenilemek yerine kullanıcıya bilgi ver
+                console.warn('Extension context kaybı tespit edildi');
+
+                // Hemen context lost döndür
                 return {
                     success: false,
-                    error: 'Extension yeniden yüklendi. Lütfen sayfayı yenileyin.',
+                    error: 'Extension yeniden yüklendi. Sayfa yenileniyor...',
                     contextLost: true
                 };
             }
