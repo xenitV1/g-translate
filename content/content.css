@@ -5,545 +5,617 @@
 
 /* Gemini Translate Popup Styles */
 .gemini-translate-popup {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    position: absolute;
-    background: white;
-    border: 1px solid #dadce0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 12px;
-    z-index: 10000;
-    font-size: 14px;
-    max-width: 300px;
-    min-width: 200px;
-    display: none;
-    opacity: 0;
-    transform: translateY(-5px);
-    transition: all 0.2s ease;
-    pointer-events: auto;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: fixed !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  border: 1px solid rgba(66, 133, 244, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(66, 133, 244, 0.05) !important;
+  padding: 20px !important;
+  z-index: 2147483647 !important; /* Maximum z-index */
+  font-size: 14px !important;
+  max-width: 320px !important;
+  min-width: 240px !important;
+  display: none !important;
+  opacity: 0 !important;
+  transform: translateY(-10px) scale(0.95) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .gemini-translate-popup.show {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
+  display: block !important;
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  visibility: visible !important;
 }
 
 .gemini-translate-popup .popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e8eaed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(66, 133, 244, 0.1);
+  background: linear-gradient(90deg, rgba(66, 133, 244, 0.05) 0%, transparent 100%);
+  margin: -20px -20px 16px -20px;
+  padding: 16px 20px 12px 20px;
+  border-radius: 16px 16px 0 0;
 }
 
 .gemini-translate-popup .popup-title {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    color: #202124;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  color: #1a73e8;
+  font-size: 16px;
+  letter-spacing: -0.01em;
 }
 
 .gemini-translate-popup .popup-title .icon {
-    margin-right: 6px;
-    font-size: 16px;
+  margin-right: 6px;
+  font-size: 16px;
 }
 
 .gemini-translate-popup .close-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #5f6368;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+  background: rgba(66, 133, 244, 0.1);
+  border: none;
+  font-size: 16px;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
 }
 
 .gemini-translate-popup .close-btn:hover {
-    background-color: #f1f3f4;
+  background: rgba(66, 133, 244, 0.2);
+  color: #1a73e8;
+  transform: scale(1.05);
 }
 
 .gemini-translate-popup .popup-content > div {
-    margin-bottom: 12px;
+  margin-bottom: 12px;
 }
 
 .gemini-translate-popup .text-label,
 .gemini-translate-popup .language-label,
 .gemini-translate-popup .detection-label,
 .gemini-translate-popup .result-label {
-    font-size: 12px;
-    color: #5f6368;
-    margin-bottom: 4px;
-    font-weight: 500;
+  font-size: 12px;
+  color: #5f6368;
+  margin-bottom: 4px;
+  font-weight: 500;
 }
 
 .gemini-translate-popup .text-content {
-    background: #f8f9fa;
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 13px;
-    line-height: 1.4;
-    max-height: 60px;
-    overflow-y: auto;
-    word-wrap: break-word;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-height: 120px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  border: 1px solid rgba(66, 133, 244, 0.1);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(66, 133, 244, 0.3) transparent;
+}
+
+/* Webkit scrollbar styling */
+.gemini-translate-popup .text-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.gemini-translate-popup .text-content::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.gemini-translate-popup .text-content::-webkit-scrollbar-thumb {
+  background: rgba(66, 133, 244, 0.3);
+  border-radius: 3px;
+}
+
+.gemini-translate-popup .text-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(66, 133, 244, 0.5);
 }
 
 .gemini-translate-popup .target-language {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #dadce0;
-    border-radius: 4px;
-    font-size: 13px;
-    background: white;
-    cursor: pointer;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-size: 13px;
+  background: white;
+  cursor: pointer;
 }
 
 .gemini-translate-popup .target-language:focus {
-    outline: none;
-    border-color: #4285f4;
-    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
 }
 
 .gemini-translate-popup .detection-content {
-    display: flex;
-    align-items: center;
-    font-size: 13px;
-    color: #5f6368;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #5f6368;
 }
 
 .gemini-translate-popup .ai-icon {
-    margin-right: 6px;
-    font-size: 14px;
+  margin-right: 6px;
+  font-size: 14px;
 }
 
 .gemini-translate-popup .action-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .gemini-translate-popup .translate-btn,
 .gemini-translate-popup .copy-btn {
-    flex: 1;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .gemini-translate-popup .translate-btn {
-    background: #4285f4;
-    color: white;
+  background: linear-gradient(135deg, #4285f4 0%, #1a73e8 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(66, 133, 244, 0.3);
+  border: none;
 }
 
 .gemini-translate-popup .translate-btn:hover:not(:disabled) {
-    background: #3367d6;
+  background: linear-gradient(135deg, #3367d6 0%, #1557b0 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(66, 133, 244, 0.4);
 }
 
 .gemini-translate-popup .translate-btn:disabled {
-    background: #dadce0;
-    color: #5f6368;
-    cursor: not-allowed;
+  background: #dadce0;
+  color: #5f6368;
+  cursor: not-allowed;
 }
 
 .gemini-translate-popup .copy-btn {
-    background: #f8f9fa;
-    color: #5f6368;
-    border: 1px solid #dadce0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8eaed 100%);
+  color: #5f6368;
+  border: 1px solid rgba(66, 133, 244, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .gemini-translate-popup .copy-btn:hover:not(:disabled) {
-    background: #e8eaed;
+  background: linear-gradient(135deg, #e8eaed 0%, #dadce0 100%);
+  border-color: rgba(66, 133, 244, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .gemini-translate-popup .copy-btn:disabled {
-    background: #f8f9fa;
-    color: #dadce0;
-    cursor: not-allowed;
+  background: #f8f9fa;
+  color: #dadce0;
+  cursor: not-allowed;
 }
 
 .gemini-translate-popup .result-content {
-    background: #e8f5e8;
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 13px;
-    line-height: 1.4;
-    word-wrap: break-word;
+  background: #e8f5e8;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  word-wrap: break-word;
 }
 
 .gemini-translate-popup .loading-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
 }
 
 .gemini-translate-popup .spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #4285f4;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #4285f4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
 }
 
 .gemini-translate-popup .loading-text {
-    font-size: 13px;
-    color: #5f6368;
+  font-size: 13px;
+  color: #5f6368;
 }
 
 /* Translation Overlay Styles */
 .gemini-translate-overlay {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    position: absolute;
-    background: white;
-    border: 1px solid #dadce0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 16px;
-    z-index: 10001;
-    font-size: 14px;
-    max-width: 400px;
-    min-width: 250px;
-    display: none;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    pointer-events: auto;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: absolute;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  z-index: 10001;
+  font-size: 14px;
+  max-width: 400px;
+  min-width: 250px;
+  display: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  pointer-events: auto;
 }
 
 .gemini-translate-overlay.show {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .gemini-translate-overlay .overlay-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #e8eaed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8eaed;
 }
 
 .gemini-translate-overlay .overlay-title {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    color: #202124;
-    font-size: 16px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #202124;
+  font-size: 16px;
 }
 
 .gemini-translate-overlay .overlay-title .icon {
-    margin-right: 8px;
-    font-size: 18px;
+  margin-right: 8px;
+  font-size: 18px;
 }
 
 .gemini-translate-overlay .overlay-actions {
-    display: flex;
-    gap: 4px;
+  display: flex;
+  gap: 4px;
 }
 
 .gemini-translate-overlay .overlay-actions button {
-    background: none;
-    border: none;
-    padding: 6px;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #5f6368;
-    font-size: 14px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 32px;
-    height: 32px;
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #5f6368;
+  font-size: 14px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
 }
 
 .gemini-translate-overlay .overlay-actions button:hover {
-    background-color: #f1f3f4;
-    color: #202124;
+  background-color: #f1f3f4;
+  color: #202124;
 }
 
 .gemini-translate-overlay .overlay-actions .close-btn {
-    font-size: 18px;
-    font-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .gemini-translate-overlay .translation-info {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 .gemini-translate-overlay .language-pair {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: #5f6368;
-    margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #5f6368;
+  margin-bottom: 8px;
 }
 
 .gemini-translate-overlay .source-lang,
 .gemini-translate-overlay .target-lang {
-    background: #f8f9fa;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: 500;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
 }
 
 .gemini-translate-overlay .arrow {
-    color: #4285f4;
-    font-weight: bold;
+  color: #4285f4;
+  font-weight: bold;
 }
 
 .gemini-translate-overlay .confidence-score {
-    font-size: 12px;
-    color: #5f6368;
+  font-size: 12px;
+  color: #5f6368;
 }
 
 .gemini-translate-overlay .confidence-value {
-    font-weight: 500;
-    color: #34a853;
+  font-weight: 500;
+  color: #34a853;
 }
 
 .gemini-translate-overlay .original-text,
 .gemini-translate-overlay .translated-text {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 .gemini-translate-overlay .text-label {
-    font-size: 12px;
-    color: #5f6368;
-    margin-bottom: 6px;
-    font-weight: 500;
+  font-size: 12px;
+  color: #5f6368;
+  margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .gemini-translate-overlay .text-content {
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    line-height: 1.5;
-    word-wrap: break-word;
-    max-height: 120px;
-    overflow-y: auto;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  max-height: 120px;
+  overflow-y: auto;
 }
 
 .gemini-translate-overlay .text-content.translated {
-    background: #e8f5e8;
-    border-left: 3px solid #34a853;
+  background: #e8f5e8;
+  border-left: 3px solid #34a853;
 }
 
 .gemini-translate-overlay .overlay-actions-bottom {
-    display: flex;
-    gap: 8px;
-    margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .gemini-translate-overlay .translate-again-btn,
 .gemini-translate-overlay .open-popup-btn {
-    flex: 1;
-    padding: 10px 16px;
-    border: 1px solid #dadce0;
-    border-radius: 6px;
-    background: white;
-    color: #5f6368;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: all 0.2s;
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  background: white;
+  color: #5f6368;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
 }
 
 .gemini-translate-overlay .translate-again-btn:hover,
 .gemini-translate-overlay .open-popup-btn:hover {
-    background: #f8f9fa;
-    border-color: #4285f4;
-    color: #4285f4;
+  background: #f8f9fa;
+  border-color: #4285f4;
+  color: #4285f4;
 }
 
 .gemini-translate-overlay .overlay-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid #e8eaed;
-    font-size: 11px;
-    color: #5f6368;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e8eaed;
+  font-size: 11px;
+  color: #5f6368;
 }
 
 .gemini-translate-overlay .powered-by {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .gemini-translate-overlay .gemini-logo {
-    font-weight: 600;
-    color: #4285f4;
+  font-weight: 600;
+  color: #4285f4;
 }
 
 .gemini-translate-overlay .btn-icon {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 /* Selection Highlight Styles */
 .gemini-selection-highlight {
-    background-color: rgba(66, 133, 244, 0.15);
-    border-radius: 2px;
-    transition: background-color 0.2s ease;
+  background-color: rgba(66, 133, 244, 0.15);
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
 }
 
 /* Notification Styles */
 .gemini-notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #4285f4;
-    color: white;
-    padding: 12px 16px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
-    max-width: 300px;
-    word-wrap: break-word;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4285f4;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  max-width: 300px;
+  word-wrap: break-word;
 }
 
 /* Animations */
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeOut {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-10px); }
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .gemini-translate-popup {
-        max-width: 280px;
-        min-width: 200px;
-        font-size: 13px;
-    }
-    
-    .gemini-translate-overlay {
-        max-width: 320px;
-        min-width: 200px;
-        font-size: 13px;
-    }
-    
-    .gemini-translate-popup .action-buttons {
-        flex-direction: column;
-        gap: 6px;
-    }
-    
-    .gemini-translate-overlay .overlay-actions-bottom {
-        flex-direction: column;
-        gap: 6px;
-    }
+  .gemini-translate-popup {
+    max-width: 280px;
+    min-width: 200px;
+    font-size: 13px;
+  }
+
+  .gemini-translate-overlay {
+    max-width: 320px;
+    min-width: 200px;
+    font-size: 13px;
+  }
+
+  .gemini-translate-popup .action-buttons {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .gemini-translate-overlay .overlay-actions-bottom {
+    flex-direction: column;
+    gap: 6px;
+  }
 }
 
 /* Dark Theme Support */
 @media (prefers-color-scheme: dark) {
-    .gemini-translate-popup {
-        background: #2d2d2d;
-        border-color: #3c4043;
-        color: #ffffff;
-    }
-    
-    .gemini-translate-popup .popup-title {
-        color: #ffffff;
-    }
-    
-    .gemini-translate-popup .text-content {
-        background: #3c4043;
-        color: #ffffff;
-    }
-    
-    .gemini-translate-popup .target-language {
-        background: #3c4043;
-        border-color: #5f6368;
-        color: #ffffff;
-    }
-    
-    .gemini-translate-popup .target-language:focus {
-        border-color: #4285f4;
-    }
-    
-    .gemini-translate-overlay {
-        background: #2d2d2d;
-        border-color: #3c4043;
-        color: #ffffff;
-    }
-    
-    .gemini-translate-overlay .overlay-title {
-        color: #ffffff;
-    }
-    
-    .gemini-translate-overlay .text-content {
-        background: #3c4043;
-        color: #ffffff;
-    }
-    
-    .gemini-translate-overlay .text-content.translated {
-        background: #1b5e20;
-        border-left-color: #4caf50;
-    }
+  .gemini-translate-popup {
+    background: #2d2d2d;
+    border-color: #3c4043;
+    color: #ffffff;
+  }
+
+  .gemini-translate-popup .popup-title {
+    color: #ffffff;
+  }
+
+  .gemini-translate-popup .text-content {
+    background: #3c4043;
+    color: #ffffff;
+  }
+
+  .gemini-translate-popup .target-language {
+    background: #3c4043;
+    border-color: #5f6368;
+    color: #ffffff;
+  }
+
+  .gemini-translate-popup .target-language:focus {
+    border-color: #4285f4;
+  }
+
+  .gemini-translate-overlay {
+    background: #2d2d2d;
+    border-color: #3c4043;
+    color: #ffffff;
+  }
+
+  .gemini-translate-overlay .overlay-title {
+    color: #ffffff;
+  }
+
+  .gemini-translate-overlay .text-content {
+    background: #3c4043;
+    color: #ffffff;
+  }
+
+  .gemini-translate-overlay .text-content.translated {
+    background: #1b5e20;
+    border-left-color: #4caf50;
+  }
 }
 
 /* High Contrast Mode */
 @media (prefers-contrast: high) {
-    .gemini-translate-popup {
-        border-width: 2px;
-        border-color: #000000;
-    }
-    
-    .gemini-translate-overlay {
-        border-width: 2px;
-        border-color: #000000;
-    }
-    
-    .gemini-translate-popup .translate-btn {
-        border: 2px solid #000000;
-    }
-    
-    .gemini-translate-overlay .translate-again-btn,
-    .gemini-translate-overlay .open-popup-btn {
-        border-width: 2px;
-    }
+  .gemini-translate-popup {
+    border-width: 2px;
+    border-color: #000000;
+  }
+
+  .gemini-translate-overlay {
+    border-width: 2px;
+    border-color: #000000;
+  }
+
+  .gemini-translate-popup .translate-btn {
+    border: 2px solid #000000;
+  }
+
+  .gemini-translate-overlay .translate-again-btn,
+  .gemini-translate-overlay .open-popup-btn {
+    border-width: 2px;
+  }
 }
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-    .gemini-translate-popup,
-    .gemini-translate-overlay {
-        transition: none;
-    }
-    
-    .gemini-translate-popup .spinner {
-        animation: none;
-    }
+  .gemini-translate-popup,
+  .gemini-translate-overlay {
+    transition: none;
+  }
+
+  .gemini-translate-popup .spinner {
+    animation: none;
+  }
 }

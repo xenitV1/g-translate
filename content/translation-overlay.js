@@ -4,32 +4,32 @@
  */
 
 class TranslationOverlay {
-    constructor() {
-        this.overlay = null;
-        this.isVisible = false;
-        this.currentTranslation = null;
-        this.overlayOffset = 5;
-        this.autoHideTimeout = null;
-        this.autoHideDelay = 5000;
-        
-        this.init();
-    }
+  constructor() {
+    this.overlay = null;
+    this.isVisible = false;
+    this.currentTranslation = null;
+    this.overlayOffset = 5;
+    this.autoHideTimeout = null;
+    this.autoHideDelay = 5000;
 
-    /**
-     * Translation overlay'ı başlat
-     */
-    init() {
-        this.createOverlayElement();
-        this.attachEventListeners();
-    }
+    this.init();
+  }
 
-    /**
-     * Overlay element'ini oluştur
-     */
-    createOverlayElement() {
-        this.overlay = document.createElement('div');
-        this.overlay.className = 'gemini-translate-overlay';
-        this.overlay.style.cssText = `
+  /**
+   * Translation overlay'ı başlat
+   */
+  init() {
+    this.createOverlayElement();
+    this.attachEventListeners();
+  }
+
+  /**
+   * Overlay element'ini oluştur
+   */
+  createOverlayElement() {
+    this.overlay = document.createElement("div");
+    this.overlay.className = "gemini-translate-overlay";
+    this.overlay.style.cssText = `
             position: absolute;
             background: white;
             border: 1px solid #dadce0;
@@ -47,8 +47,8 @@ class TranslationOverlay {
             transition: all 0.3s ease;
             pointer-events: auto;
         `;
-        
-        this.overlay.innerHTML = `
+
+    this.overlay.innerHTML = `
             <div class="overlay-header">
                 <div class="overlay-title">
                     <span class="icon">🔤</span>
@@ -108,20 +108,20 @@ class TranslationOverlay {
                 </div>
             </div>
         `;
-        
-        // Stil ekle
-        this.addOverlayStyles();
-        
-        // Document'a ekle
-        document.body.appendChild(this.overlay);
-    }
 
-    /**
-     * Overlay stillerini ekle
-     */
-    addOverlayStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
+    // Stil ekle
+    this.addOverlayStyles();
+
+    // Document'a ekle
+    document.body.appendChild(this.overlay);
+  }
+
+  /**
+   * Overlay stillerini ekle
+   */
+  addOverlayStyles() {
+    const style = document.createElement("style");
+    style.textContent = `
             .gemini-translate-overlay {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             }
@@ -306,351 +306,367 @@ class TranslationOverlay {
                 font-size: 12px;
             }
         `;
-        
-        document.head.appendChild(style);
-    }
 
-    /**
-     * Event listener'ları ekle
-     */
-    attachEventListeners() {
-        // Close button
-        this.overlay.querySelector('.close-btn').addEventListener('click', () => {
-            this.hideOverlay();
-        });
-        
-        // Copy button
-        this.overlay.querySelector('.copy-btn').addEventListener('click', () => {
-            this.copyTranslation();
-        });
-        
-        // Save button
-        this.overlay.querySelector('.save-btn').addEventListener('click', () => {
-            this.saveTranslation();
-        });
-        
-        // Translate again button
-        this.overlay.querySelector('.translate-again-btn').addEventListener('click', () => {
-            this.translateAgain();
-        });
-        
-        // Open popup button
-        this.overlay.querySelector('.open-popup-btn').addEventListener('click', () => {
-            this.openMainPopup();
-        });
-        
-        // Click outside to close
-        document.addEventListener('click', (event) => {
-            if (!this.overlay.contains(event.target) && this.isVisible) {
-                this.hideOverlay();
-            }
-        });
-        
-        // Keyboard events
-        document.addEventListener('keydown', (event) => {
-            if (this.isVisible) {
-                if (event.key === 'Escape') {
-                    this.hideOverlay();
-                } else if (event.key === 'c' && event.ctrlKey) {
-                    event.preventDefault();
-                    this.copyTranslation();
-                }
-            }
-        });
-    }
+    document.head.appendChild(style);
+  }
 
-    /**
-     * Overlay'ı göster
-     */
-    showOverlay(translation, position = null) {
-        if (this.isVisible) {
-            this.hideOverlay();
-        }
-        
-        this.currentTranslation = translation;
-        this.updateOverlayContent();
-        this.positionOverlay(position);
-        this.showOverlayElement();
-        this.startAutoHide();
-    }
+  /**
+   * Event listener'ları ekle
+   */
+  attachEventListeners() {
+    // Close button
+    this.overlay.querySelector(".close-btn").addEventListener("click", () => {
+      this.hideOverlay();
+    });
 
-    /**
-     * Overlay'ı gizle
-     */
-    hideOverlay() {
-        if (!this.isVisible) return;
-        
-        this.clearAutoHide();
-        this.hideOverlayElement();
-        this.currentTranslation = null;
-    }
+    // Copy button
+    this.overlay.querySelector(".copy-btn").addEventListener("click", () => {
+      this.copyTranslation();
+    });
 
-    /**
-     * Overlay element'ini göster
-     */
-    showOverlayElement() {
-        this.overlay.style.display = 'block';
-        this.isVisible = true;
-        
-        // Animation için kısa gecikme
-        setTimeout(() => {
-            this.overlay.classList.add('show');
-        }, 10);
-    }
+    // Save button
+    this.overlay.querySelector(".save-btn").addEventListener("click", () => {
+      this.saveTranslation();
+    });
 
-    /**
-     * Overlay element'ini gizle
-     */
-    hideOverlayElement() {
-        this.overlay.classList.remove('show');
-        this.isVisible = false;
-        
-        // Animation tamamlandıktan sonra gizle
-        setTimeout(() => {
-            this.overlay.style.display = 'none';
-        }, 300);
-    }
+    // Translate again button
+    this.overlay
+      .querySelector(".translate-again-btn")
+      .addEventListener("click", () => {
+        this.translateAgain();
+      });
 
-    /**
-     * Overlay içeriğini güncelle
-     */
-    updateOverlayContent() {
-        if (!this.currentTranslation) return;
-        
-        // Dil bilgilerini güncelle
-        const sourceLang = this.overlay.querySelector('.source-lang');
-        const targetLang = this.overlay.querySelector('.target-lang');
-        sourceLang.textContent = this.currentTranslation.sourceLanguage.name;
-        targetLang.textContent = this.currentTranslation.targetLanguage.name;
-        
-        // Güven skorunu göster
-        if (this.currentTranslation.confidence) {
-            const confidenceScore = this.overlay.querySelector('.confidence-score');
-            const confidenceValue = this.overlay.querySelector('.confidence-value');
-            confidenceValue.textContent = `${Math.round(this.currentTranslation.confidence * 100)}%`;
-            confidenceScore.style.display = 'block';
-        }
-        
-        // Orijinal metni göster
-        const originalText = this.overlay.querySelector('.text-content.original');
-        originalText.textContent = this.currentTranslation.originalText;
-        
-        // Çeviri metnini göster
-        const translatedText = this.overlay.querySelector('.text-content.translated');
-        translatedText.textContent = this.currentTranslation.translatedText;
-        
-        // Timestamp'i güncelle
-        const timestamp = this.overlay.querySelector('.timestamp');
-        timestamp.textContent = new Date(this.currentTranslation.timestamp).toLocaleTimeString();
-    }
-
-    /**
-     * Overlay pozisyonunu ayarla
-     */
-    positionOverlay(position = null) {
-        if (position) {
-            // Belirtilen pozisyonda göster
-            this.overlay.style.left = `${position.x}px`;
-            this.overlay.style.top = `${position.y}px`;
-        } else if (this.currentTranslation && this.currentTranslation.rect) {
-            // Seçim pozisyonuna göre ayarla
-            const rect = this.currentTranslation.rect;
-            const overlayRect = this.overlay.getBoundingClientRect();
-            
-            // Viewport boyutları
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            
-            // Pozisyon hesapla
-            let left = rect.left + (rect.width / 2) - (overlayRect.width / 2);
-            let top = rect.bottom + this.overlayOffset;
-            
-            // Viewport sınırlarını kontrol et
-            if (left < 10) {
-                left = 10;
-            } else if (left + overlayRect.width > viewportWidth - 10) {
-                left = viewportWidth - overlayRect.width - 10;
-            }
-            
-            if (top + overlayRect.height > viewportHeight - 10) {
-                // Yukarıda göster
-                top = rect.top - overlayRect.height - this.overlayOffset;
-            }
-            
-            // Pozisyonu ayarla
-            this.overlay.style.left = `${left}px`;
-            this.overlay.style.top = `${top}px`;
-        } else {
-            // Merkezde göster
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const overlayRect = this.overlay.getBoundingClientRect();
-            
-            this.overlay.style.left = `${(viewportWidth - overlayRect.width) / 2}px`;
-            this.overlay.style.top = `${(viewportHeight - overlayRect.height) / 2}px`;
-        }
-    }
-
-    /**
-     * Çeviriyi kopyala
-     */
-    async copyTranslation() {
-        if (!this.currentTranslation) return;
-        
-        try {
-            await navigator.clipboard.writeText(this.currentTranslation.translatedText);
-            
-            // Başarı göstergesi
-            this.showCopySuccess();
-            
-        } catch (error) {
-            console.error('Kopyalama hatası:', error);
-        }
-    }
-
-    /**
-     * Kopyalama başarı göstergesi
-     */
-    showCopySuccess() {
-        const copyBtn = this.overlay.querySelector('.copy-btn');
-        const originalContent = copyBtn.innerHTML;
-        
-        copyBtn.innerHTML = '<span class="btn-icon">✓</span>';
-        copyBtn.style.color = '#34a853';
-        
-        setTimeout(() => {
-            copyBtn.innerHTML = originalContent;
-            copyBtn.style.color = '';
-        }, 2000);
-    }
-
-    /**
-     * Çeviriyi kaydet
-     */
-    async saveTranslation() {
-        if (!this.currentTranslation) return;
-        
-        try {
-            // Background script'e kaydetme isteği gönder
-            const response = await this.sendMessageToBackground({
-                type: APP_CONSTANTS.MESSAGE_TYPES.SAVE_HISTORY,
-                data: this.currentTranslation
-            });
-            
-            if (response.success) {
-                this.showSaveSuccess();
-            } else {
-                console.error('Kaydetme hatası:', response.error);
-            }
-            
-        } catch (error) {
-            console.error('Kaydetme hatası:', error);
-        }
-    }
-
-    /**
-     * Kaydetme başarı göstergesi
-     */
-    showSaveSuccess() {
-        const saveBtn = this.overlay.querySelector('.save-btn');
-        const originalContent = saveBtn.innerHTML;
-        
-        saveBtn.innerHTML = '<span class="btn-icon">✓</span>';
-        saveBtn.style.color = '#34a853';
-        
-        setTimeout(() => {
-            saveBtn.innerHTML = originalContent;
-            saveBtn.style.color = '';
-        }, 2000);
-    }
-
-    /**
-     * Tekrar çevir
-     */
-    translateAgain() {
-        if (!this.currentTranslation) return;
-        
-        // Ana popup'ı aç ve metni gönder
+    // Open popup button
+    this.overlay
+      .querySelector(".open-popup-btn")
+      .addEventListener("click", () => {
         this.openMainPopup();
-        
-        // Overlay'ı gizle
+      });
+
+    // Click outside to close
+    document.addEventListener("click", (event) => {
+      if (!this.overlay.contains(event.target) && this.isVisible) {
         this.hideOverlay();
-    }
+      }
+    });
 
-    /**
-     * Ana popup'ı aç
-     */
-    openMainPopup() {
-        // Background script'e popup açma isteği gönder
-        this.sendMessageToBackground({
-            type: APP_CONSTANTS.MESSAGE_TYPES.OPEN_POPUP,
-            data: { 
-                text: this.currentTranslation ? this.currentTranslation.originalText : ''
-            }
-        });
-    }
-
-    /**
-     * Auto-hide başlat
-     */
-    startAutoHide() {
-        this.clearAutoHide();
-        this.autoHideTimeout = setTimeout(() => {
-            this.hideOverlay();
-        }, this.autoHideDelay);
-    }
-
-    /**
-     * Auto-hide temizle
-     */
-    clearAutoHide() {
-        if (this.autoHideTimeout) {
-            clearTimeout(this.autoHideTimeout);
-            this.autoHideTimeout = null;
+    // Keyboard events
+    document.addEventListener("keydown", (event) => {
+      if (this.isVisible) {
+        if (event.key === "Escape") {
+          this.hideOverlay();
+        } else if (event.key === "c" && event.ctrlKey) {
+          event.preventDefault();
+          this.copyTranslation();
         }
+      }
+    });
+  }
+
+  /**
+   * Overlay'ı göster
+   */
+  showOverlay(translation, position = null) {
+    if (this.isVisible) {
+      this.hideOverlay();
     }
 
-    /**
-     * Background script'e mesaj gönder
-     */
-    async sendMessageToBackground(message) {
-        try {
-            const compatibilityLayer = window.compatibilityLayer || chrome;
-            return await compatibilityLayer.runtime.sendMessage(message);
-        } catch (error) {
-            console.error('Background mesaj gönderme hatası:', error);
-            return { success: false, error: error.message };
-        }
+    this.currentTranslation = translation;
+    this.updateOverlayContent();
+    this.positionOverlay(position);
+    this.showOverlayElement();
+    this.startAutoHide();
+  }
+
+  /**
+   * Overlay'ı gizle
+   */
+  hideOverlay() {
+    if (!this.isVisible) return;
+
+    this.clearAutoHide();
+    this.hideOverlayElement();
+    this.currentTranslation = null;
+  }
+
+  /**
+   * Overlay element'ini göster
+   */
+  showOverlayElement() {
+    this.overlay.style.display = "block";
+    this.isVisible = true;
+
+    // Animation için kısa gecikme
+    setTimeout(() => {
+      this.overlay.classList.add("show");
+    }, 10);
+  }
+
+  /**
+   * Overlay element'ini gizle
+   */
+  hideOverlayElement() {
+    this.overlay.classList.remove("show");
+    this.isVisible = false;
+
+    // Animation tamamlandıktan sonra gizle
+    setTimeout(() => {
+      this.overlay.style.display = "none";
+    }, 300);
+  }
+
+  /**
+   * Overlay içeriğini güncelle
+   */
+  updateOverlayContent() {
+    if (!this.currentTranslation) return;
+
+    // Dil bilgilerini güncelle
+    const sourceLang = this.overlay.querySelector(".source-lang");
+    const targetLang = this.overlay.querySelector(".target-lang");
+    sourceLang.textContent =
+      this.currentTranslation.sourceLanguage?.name ||
+      this.currentTranslation.sourceLanguage?.code ||
+      "Bilinmeyen";
+    targetLang.textContent =
+      this.currentTranslation.targetLanguage?.name ||
+      this.currentTranslation.targetLanguage?.code ||
+      "Bilinmeyen";
+
+    // Güven skorunu göster
+    if (this.currentTranslation.confidence) {
+      const confidenceScore = this.overlay.querySelector(".confidence-score");
+      const confidenceValue = this.overlay.querySelector(".confidence-value");
+      confidenceValue.textContent = `${Math.round(this.currentTranslation.confidence * 100)}%`;
+      confidenceScore.style.display = "block";
     }
 
-    /**
-     * Overlay görünür mü kontrol et
-     */
-    isOverlayVisible() {
-        return this.isVisible;
+    // Orijinal metni göster
+    const originalText = this.overlay.querySelector(".text-content.original");
+    originalText.textContent = this.currentTranslation.originalText;
+
+    // Çeviri metnini göster
+    const translatedText = this.overlay.querySelector(
+      ".text-content.translated",
+    );
+    translatedText.textContent = this.currentTranslation.translatedText;
+
+    // Timestamp'i güncelle
+    const timestamp = this.overlay.querySelector(".timestamp");
+    timestamp.textContent = new Date(
+      this.currentTranslation.timestamp,
+    ).toLocaleTimeString();
+  }
+
+  /**
+   * Overlay pozisyonunu ayarla
+   */
+  positionOverlay(position = null) {
+    if (position) {
+      // Belirtilen pozisyonda göster
+      this.overlay.style.left = `${position.x}px`;
+      this.overlay.style.top = `${position.y}px`;
+    } else if (this.currentTranslation && this.currentTranslation.rect) {
+      // Seçim pozisyonuna göre ayarla
+      const rect = this.currentTranslation.rect;
+      const overlayRect = this.overlay.getBoundingClientRect();
+
+      // Viewport boyutları
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Pozisyon hesapla
+      let left = rect.left + rect.width / 2 - overlayRect.width / 2;
+      let top = rect.bottom + this.overlayOffset;
+
+      // Viewport sınırlarını kontrol et
+      if (left < 10) {
+        left = 10;
+      } else if (left + overlayRect.width > viewportWidth - 10) {
+        left = viewportWidth - overlayRect.width - 10;
+      }
+
+      if (top + overlayRect.height > viewportHeight - 10) {
+        // Yukarıda göster
+        top = rect.top - overlayRect.height - this.overlayOffset;
+      }
+
+      // Pozisyonu ayarla
+      this.overlay.style.left = `${left}px`;
+      this.overlay.style.top = `${top}px`;
+    } else {
+      // Merkezde göster
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const overlayRect = this.overlay.getBoundingClientRect();
+
+      this.overlay.style.left = `${(viewportWidth - overlayRect.width) / 2}px`;
+      this.overlay.style.top = `${(viewportHeight - overlayRect.height) / 2}px`;
+    }
+  }
+
+  /**
+   * Çeviriyi kopyala
+   */
+  async copyTranslation() {
+    if (!this.currentTranslation) return;
+
+    try {
+      await navigator.clipboard.writeText(
+        this.currentTranslation.translatedText,
+      );
+
+      // Başarı göstergesi
+      this.showCopySuccess();
+    } catch (error) {
+      console.error("Kopyalama hatası:", error);
+    }
+  }
+
+  /**
+   * Kopyalama başarı göstergesi
+   */
+  showCopySuccess() {
+    const copyBtn = this.overlay.querySelector(".copy-btn");
+    const originalContent = copyBtn.innerHTML;
+
+    copyBtn.innerHTML = '<span class="btn-icon">✓</span>';
+    copyBtn.style.color = "#34a853";
+
+    setTimeout(() => {
+      copyBtn.innerHTML = originalContent;
+      copyBtn.style.color = "";
+    }, 2000);
+  }
+
+  /**
+   * Çeviriyi kaydet
+   */
+  async saveTranslation() {
+    if (!this.currentTranslation) return;
+
+    try {
+      // Background script'e kaydetme isteği gönder
+      const response = await this.sendMessageToBackground({
+        type: APP_CONSTANTS.MESSAGE_TYPES.SAVE_HISTORY,
+        data: this.currentTranslation,
+      });
+
+      if (response.success) {
+        this.showSaveSuccess();
+      } else {
+        console.error("Kaydetme hatası:", response.error);
+      }
+    } catch (error) {
+      console.error("Kaydetme hatası:", error);
+    }
+  }
+
+  /**
+   * Kaydetme başarı göstergesi
+   */
+  showSaveSuccess() {
+    const saveBtn = this.overlay.querySelector(".save-btn");
+    const originalContent = saveBtn.innerHTML;
+
+    saveBtn.innerHTML = '<span class="btn-icon">✓</span>';
+    saveBtn.style.color = "#34a853";
+
+    setTimeout(() => {
+      saveBtn.innerHTML = originalContent;
+      saveBtn.style.color = "";
+    }, 2000);
+  }
+
+  /**
+   * Tekrar çevir
+   */
+  translateAgain() {
+    if (!this.currentTranslation) return;
+
+    // Ana popup'ı aç ve metni gönder
+    this.openMainPopup();
+
+    // Overlay'ı gizle
+    this.hideOverlay();
+  }
+
+  /**
+   * Ana popup'ı aç
+   */
+  openMainPopup() {
+    // Background script'e popup açma isteği gönder
+    this.sendMessageToBackground({
+      type: APP_CONSTANTS.MESSAGE_TYPES.OPEN_POPUP,
+      data: {
+        text: this.currentTranslation
+          ? this.currentTranslation.originalText
+          : "",
+      },
+    });
+  }
+
+  /**
+   * Auto-hide başlat
+   */
+  startAutoHide() {
+    this.clearAutoHide();
+    this.autoHideTimeout = setTimeout(() => {
+      this.hideOverlay();
+    }, this.autoHideDelay);
+  }
+
+  /**
+   * Auto-hide temizle
+   */
+  clearAutoHide() {
+    if (this.autoHideTimeout) {
+      clearTimeout(this.autoHideTimeout);
+      this.autoHideTimeout = null;
+    }
+  }
+
+  /**
+   * Background script'e mesaj gönder
+   */
+  async sendMessageToBackground(message) {
+    try {
+      const compatibilityLayer = window.compatibilityLayer || chrome;
+      return await compatibilityLayer.runtime.sendMessage(message);
+    } catch (error) {
+      console.error("Background mesaj gönderme hatası:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Overlay görünür mü kontrol et
+   */
+  isOverlayVisible() {
+    return this.isVisible;
+  }
+
+  /**
+   * Translation overlay'ı temizle
+   */
+  destroy() {
+    this.hideOverlay();
+    this.clearAutoHide();
+
+    if (this.overlay && this.overlay.parentNode) {
+      this.overlay.parentNode.removeChild(this.overlay);
     }
 
-    /**
-     * Translation overlay'ı temizle
-     */
-    destroy() {
-        this.hideOverlay();
-        this.clearAutoHide();
-        
-        if (this.overlay && this.overlay.parentNode) {
-            this.overlay.parentNode.removeChild(this.overlay);
-        }
-        
-        this.overlay = null;
-        this.currentTranslation = null;
-    }
+    this.overlay = null;
+    this.currentTranslation = null;
+  }
 }
 
 // Export for different module systems
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = TranslationOverlay;
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = TranslationOverlay;
 }
 
-if (typeof window !== 'undefined' && !window.TranslationOverlay) {
-    window.TranslationOverlay = TranslationOverlay;
+if (typeof window !== "undefined" && !window.TranslationOverlay) {
+  window.TranslationOverlay = TranslationOverlay;
 }
