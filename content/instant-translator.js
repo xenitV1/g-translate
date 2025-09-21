@@ -6,13 +6,13 @@
 class InstantTranslator {
     constructor() {
         this.popup = null;
-        this.isVisible = false;
+        this._isVisible = false;
         this.isTranslating = false;
         this.currentSelection = null;
         this.autoHideTimeout = null;
         this.autoHideDelay = 3000;
         this.popupOffset = 10;
-        
+
         this.init();
     }
 
@@ -342,14 +342,14 @@ class InstantTranslator {
         
         // Click outside to close
         document.addEventListener('click', (event) => {
-            if (!this.popup.contains(event.target) && this.isVisible) {
+            if (!this.popup.contains(event.target) && this._isVisible) {
                 this.hidePopup();
             }
         });
         
         // Keyboard events
         document.addEventListener('keydown', (event) => {
-            if (this.isVisible) {
+            if (this._isVisible) {
                 if (event.key === 'Escape') {
                     this.hidePopup();
                 } else if (event.key === 'Enter' && event.ctrlKey) {
@@ -390,8 +390,8 @@ class InstantTranslator {
      */
     showPopupElement() {
         this.popup.style.display = 'block';
-        this.isVisible = true;
-        
+        this._isVisible = true;
+
         // Animation için kısa gecikme
         setTimeout(() => {
             this.popup.classList.add('show');
@@ -403,8 +403,8 @@ class InstantTranslator {
      */
     hidePopupElement() {
         this.popup.classList.remove('show');
-        this.isVisible = false;
-        
+        this._isVisible = false;
+
         // Animation tamamlandıktan sonra gizle
         setTimeout(() => {
             this.popup.style.display = 'none';
@@ -444,8 +444,8 @@ class InstantTranslator {
 
         let left, top;
 
-        if (rect && rect.left !== undefined && rect.top !== undefined && rect.width !== undefined && rect.bottom !== undefined) {
-            // Pozisyon hesapla - rect mevcut
+        if (rect && typeof rect.left === 'number' && typeof rect.top === 'number' && typeof rect.width === 'number' && typeof rect.bottom === 'number') {
+            // Pozisyon hesapla - rect mevcut ve geçerli
             left = rect.left + (rect.width / 2) - (popupRect.width / 2);
             top = rect.bottom + this.popupOffset;
 
@@ -461,10 +461,21 @@ class InstantTranslator {
                 top = rect.top - popupRect.height - this.popupOffset;
             }
         } else {
-            // Rect mevcut değilse - merkezde göster
-            console.warn('Selection rect mevcut değil, varsayılan pozisyon kullanılıyor');
-            left = (viewportWidth - popupRect.width) / 2;
-            top = (viewportHeight - popupRect.height) / 2;
+            // Rect mevcut değilse - mouse pozisyonuna göre göster veya merkezde göster
+            console.warn('Selection rect mevcut değil veya geçersiz, varsayılan pozisyon kullanılıyor');
+
+            // Mouse pozisyonunu almaya çalış
+            const mouseX = window.mouseX || (viewportWidth / 2);
+            const mouseY = window.mouseY || (viewportHeight / 2);
+
+            left = mouseX - (popupRect.width / 2);
+            top = mouseY + 20; // Mouse'un altında göster
+
+            // Viewport sınırlarını kontrol et
+            if (left < 10) left = 10;
+            if (left + popupRect.width > viewportWidth - 10) left = viewportWidth - popupRect.width - 10;
+            if (top + popupRect.height > viewportHeight - 10) top = viewportHeight - popupRect.height - 10;
+            if (top < 10) top = 10;
         }
 
         // Pozisyonu ayarla
@@ -691,7 +702,7 @@ class InstantTranslator {
      * Popup görünür mü kontrol et
      */
     isPopupVisible() {
-        return this.isVisible;
+        return this._isVisible;
     }
 
     /**

@@ -101,16 +101,28 @@ class ContentScriptController {
         // Metin seçimi olayları
         document.addEventListener('mouseup', this.handleTextSelection.bind(this));
         document.addEventListener('keyup', this.handleTextSelection.bind(this));
-        
+
+        // Mouse pozisyonunu takip et
+        document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+
         // Click outside to close
         document.addEventListener('click', this.handleDocumentClick.bind(this));
-        
+
         // Keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
-        
+
         // Scroll events (popup pozisyonunu güncelle)
         window.addEventListener('scroll', this.handleScroll.bind(this));
         window.addEventListener('resize', this.handleResize.bind(this));
+    }
+
+    /**
+     * Mouse hareketi işleyici
+     */
+    handleMouseMove(event) {
+        // Mouse pozisyonunu global olarak sakla
+        window.mouseX = event.clientX;
+        window.mouseY = event.clientY;
     }
 
     /**
@@ -140,10 +152,13 @@ class ContentScriptController {
             const range = selection.getRangeAt(0);
             const rect = range.getBoundingClientRect();
 
+            // Rect'in geçerli olduğundan emin ol
+            const validRect = rect && typeof rect.left === 'number' && typeof rect.top === 'number' ? rect : null;
+
             this.currentSelection = {
                 text: selectedText,
                 range: range,
-                rect: rect,
+                rect: validRect,
                 timestamp: Date.now()
             };
 
