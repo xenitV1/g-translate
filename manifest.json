@@ -58,8 +58,8 @@
   "commands": {
     "translate-selected": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Y",
-        "mac": "Command+Shift+Y"
+        "default": "Ctrl+Z",
+        "mac": "Command+Z"
       },
       "description": "Seçili metni çevir / Hızlı çeviri"
     },

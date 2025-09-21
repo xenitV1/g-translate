@@ -210,8 +210,8 @@ class ContentScriptController {
      * Klavye kısayolları
      */
     handleKeyboardShortcuts(event) {
-        // Ctrl+Shift+Y ile hızlı çeviri
-        if (event.ctrlKey && event.shiftKey && event.key === 'Y') {
+        // Ctrl+Z ile hızlı çeviri
+        if (event.ctrlKey && !event.shiftKey && event.key === 'z') {
             event.preventDefault();
             this.quickTranslate();
         }
