@@ -4,8 +4,9 @@
  */
 
 class StorageManager {
-    constructor() {
+    constructor(compatibilityLayer = null) {
         this.isInitialized = false;
+        this.compatibilityLayer = compatibilityLayer || self.compatibilityLayer || chrome;
 
         this.init();
     }
@@ -31,19 +32,28 @@ class StorageManager {
      */
     async testStorage() {
         try {
+            // Compatibility layer kontrolü
+            if (!this.compatibilityLayer || !this.compatibilityLayer.storage || !this.compatibilityLayer.storage.local) {
+                throw new Error('Storage API mevcut değil');
+            }
+
             const testKey = 'storage_test';
             const testValue = Date.now();
 
-            await chrome.storage.local.set({ [testKey]: testValue });
-            const result = await chrome.storage.local.get([testKey]);
+            console.log('Storage test başlatılıyor...');
+
+            await this.compatibilityLayer.storage.local.set({ [testKey]: testValue });
+            const result = await this.compatibilityLayer.storage.local.get([testKey]);
 
             if (result[testKey] !== testValue) {
                 throw new Error('Storage test başarısız');
             }
 
-            await chrome.storage.local.remove([testKey]);
+            await this.compatibilityLayer.storage.local.remove([testKey]);
+            console.log('Storage test başarılı');
 
         } catch (error) {
+            console.error('Storage test hatası:', error);
             throw new Error(`Storage test hatası: ${error.message}`);
         }
     }
