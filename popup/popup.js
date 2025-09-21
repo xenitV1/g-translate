@@ -5,12 +5,33 @@
 
 class PopupController {
     constructor() {
-        this.apiHandler = null;
         this.currentTranslation = null;
         this.isTranslating = false;
         this.settings = null;
-        
+
         this.init();
+    }
+
+    /**
+     * Background'a mesaj gönder
+     */
+    async sendMessageToBackground(message) {
+        return new Promise((resolve, reject) => {
+            const compatibilityLayer = window.compatibilityLayer || chrome;
+
+            if (!compatibilityLayer || !compatibilityLayer.runtime) {
+                reject(new Error('Browser API mevcut değil'));
+                return;
+            }
+
+            compatibilityLayer.runtime.sendMessage(message, (response) => {
+                if (chrome.runtime.lastError) {
+                    reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                    resolve(response);
+                }
+            });
+        });
     }
 
     /**
@@ -122,8 +143,15 @@ class PopupController {
      */
     async loadSettings() {
         try {
-            const result = await chrome.storage.local.get([APP_CONSTANTS.STORAGE_KEYS.SETTINGS]);
-            this.settings = result[APP_CONSTANTS.STORAGE_KEYS.SETTINGS] || APP_CONSTANTS.DEFAULT_SETTINGS;
+            const response = await this.sendMessageToBackground({
+                type: APP_CONSTANTS.MESSAGE_TYPES.GET_SETTINGS
+            });
+
+            if (response.success && response.data) {
+                this.settings = response.data;
+            } else {
+                this.settings = APP_CONSTANTS.DEFAULT_SETTINGS;
+            }
 
             // Hedef dili ayarla
             if (this.settings.targetLanguage) {
@@ -141,9 +169,9 @@ class PopupController {
      */
     async saveSettings() {
         try {
-            const compatibilityLayer = window.compatibilityLayer || chrome;
-            await compatibilityLayer.setStorageData({
-                [APP_CONSTANTS.STORAGE_KEYS.SETTINGS]: this.settings
+            await this.sendMessageToBackground({
+                type: APP_CONSTANTS.MESSAGE_TYPES.SAVE_SETTINGS,
+                data: this.settings
             });
         } catch (error) {
             console.error('Ayarlar kaydetme hatası:', error);
@@ -155,15 +183,19 @@ class PopupController {
      */
     async checkAPIStatus() {
         try {
-            const status = await this.apiHandler.checkAPIStatus();
-            this.elements.apiStatus.textContent = status.message;
-            
-            if (status.status === 'error') {
-                this.elements.apiStatus.style.color = 'var(--error-color)';
-            } else {
+            const response = await this.sendMessageToBackground({
+                type: APP_CONSTANTS.MESSAGE_TYPES.GET_CURRENT_API
+            });
+
+            if (response.success && response.data) {
+                this.elements.apiStatus.textContent = `${response.data.name} aktif`;
                 this.elements.apiStatus.style.color = 'var(--success-color)';
+            } else {
+                this.elements.apiStatus.textContent = 'API seçilmemiş';
+                this.elements.apiStatus.style.color = 'var(--warning-color)';
             }
         } catch (error) {
+            console.error('API durumu kontrol hatası:', error);
             this.elements.apiStatus.textContent = 'API bağlantısı hatası';
             this.elements.apiStatus.style.color = 'var(--error-color)';
         }
@@ -241,13 +273,21 @@ class PopupController {
 
         try {
             this.updateDetectionIndicator('Dil tespit ediliyor...', 'detecting');
-            
-            const detectedLang = await this.apiHandler.detectLanguage(text);
-            
-            if (detectedLang && detectedLang.code !== 'auto') {
-                this.updateDetectionIndicator(`Kaynak dil: ${detectedLang.name}`, detectedLang.code);
+
+            const response = await this.sendMessageToBackground({
+                type: APP_CONSTANTS.MESSAGE_TYPES.DETECT_LANGUAGE,
+                data: { text: text }
+            });
+
+            if (response.success && response.data) {
+                const detectedLang = response.data;
+                if (detectedLang && detectedLang.code !== 'auto') {
+                    this.updateDetectionIndicator(`Kaynak dil: ${detectedLang.name}`, detectedLang.code);
+                } else {
+                    this.updateDetectionIndicator('Kaynak dil belirsiz', 'unknown');
+                }
             } else {
-                this.updateDetectionIndicator('Kaynak dil belirsiz', 'unknown');
+                this.updateDetectionIndicator('Dil tespiti başarısız', 'error');
             }
         } catch (error) {
             console.error('Dil tespiti hatası:', error);
@@ -332,8 +372,21 @@ class PopupController {
             this.elements.loadingText.textContent = 'Çevriliyor...';
             this.elements.loadingSection.style.display = 'flex';
             
-            // Çeviri işlemi
-            const result = await this.apiHandler.translateText(text, targetLanguage);
+            // Çeviri işlemi - background'a mesaj gönder
+            const response = await this.sendMessageToBackground({
+                type: APP_CONSTANTS.MESSAGE_TYPES.TRANSLATE_TEXT,
+                data: {
+                    text: text,
+                    targetLanguage: targetLanguage,
+                    sourceLanguage: null
+                }
+            });
+
+            if (!response.success) {
+                throw new Error(response.error || 'Çeviri başarısız oldu');
+            }
+
+            const result = response.data;
             
             // Sonucu göster
             this.showTranslationResult(result);
@@ -478,28 +531,10 @@ class PopupController {
      */
     async saveToHistory(translation) {
         try {
-            const compatibilityLayer = window.compatibilityLayer || chrome;
-            const result = await compatibilityLayer.getStorageData([APP_CONSTANTS.STORAGE_KEYS.HISTORY]);
-            let history = result[APP_CONSTANTS.STORAGE_KEYS.HISTORY] || [];
-            
-            // Yeni çeviriyi ekle
-            history.unshift({
-                ...translation,
-                id: Date.now(),
-                timestamp: Date.now()
+            await this.sendMessageToBackground({
+                type: APP_CONSTANTS.MESSAGE_TYPES.SAVE_HISTORY,
+                data: translation
             });
-            
-            // Maksimum geçmiş limitini kontrol et
-            const maxHistory = this.settings?.maxHistoryItems || APP_CONSTANTS.MAX_TRANSLATION_HISTORY;
-            if (history.length > maxHistory) {
-                history = history.slice(0, maxHistory);
-            }
-            
-            // Geçmişi kaydet
-            await compatibilityLayer.setStorageData({
-                [APP_CONSTANTS.STORAGE_KEYS.HISTORY]: history
-            });
-            
         } catch (error) {
             console.error('Geçmişe kaydetme hatası:', error);
         }
@@ -585,18 +620,11 @@ class PopupController {
      */
     async getSelectedText() {
         try {
-            // Content script'ten seçili metni al
-            const compatibilityLayer = window.compatibilityLayer || chrome;
-            const tabs = await compatibilityLayer.tabs.query({ active: true, currentWindow: true });
-            if (tabs.length === 0) return null;
-            
-            const activeTab = tabs[0];
-            
-            // Content script'e mesaj gönder
-            const response = await compatibilityLayer.tabs.sendMessage(activeTab.id, {
+            // Content script'ten seçili metni al - background üzerinden
+            const response = await this.sendMessageToBackground({
                 type: 'GET_SELECTED_TEXT'
             });
-            
+
             return response?.text || null;
         } catch (error) {
             console.error('Seçili metin alma hatası:', error);
