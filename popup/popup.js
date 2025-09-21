@@ -617,12 +617,13 @@ class PopupController {
      * Ayarları aç
      */
     openSettings() {
-        // Ayarlar sayfasını aç
-        const compatibilityLayer = window.compatibilityLayer || chrome;
-        if (compatibilityLayer.getRuntime && compatibilityLayer.getRuntime().openOptionsPage) {
-            compatibilityLayer.getRuntime().openOptionsPage();
+        // Ayarlar sayfasını aç - Chrome API'sini doğrudan kullan
+        if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
+            chrome.runtime.openOptionsPage();
         } else {
-            window.open('options/options.html', '_blank');
+            // Fallback: options sayfasını manuel olarak aç
+            const optionsUrl = chrome.runtime.getURL('options/options.html');
+            window.open(optionsUrl, '_blank');
         }
     }
 

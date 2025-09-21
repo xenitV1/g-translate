@@ -19,19 +19,19 @@ class OptionsController {
         try {
             // DOM elementlerini al
             this.elements = this.getElements();
-            
+
             // Ayarları yükle
             await this.loadSettings();
-            
+
             // Event listener'ları ekle
             this.attachEventListeners();
-            
+
             // UI'ı güncelle
             this.updateUI();
-            
+
             // API durumunu kontrol et
             await this.checkAPIStatus();
-            
+
             console.log('Options sayfası başlatıldı');
         } catch (error) {
             console.error('Options başlatma hatası:', error);
@@ -297,9 +297,15 @@ class OptionsController {
             await this.loadAvailableAPIs();
 
             // Geçerli API'yi al
-            const currentAPIResult = await chrome.runtime.sendMessage({
-                type: APP_CONSTANTS.MESSAGE_TYPES.GET_CURRENT_API
-            });
+            let currentAPIResult;
+            try {
+                currentAPIResult = await chrome.runtime.sendMessage({
+                    type: APP_CONSTANTS.MESSAGE_TYPES.GET_CURRENT_API
+                });
+            } catch (error) {
+                console.warn('Background script hazır değil, API durum kontrol edilemiyor:', error);
+                currentAPIResult = { success: false };
+            }
 
             if (currentAPIResult.success) {
                 const currentAPI = currentAPIResult.data;
@@ -337,9 +343,15 @@ class OptionsController {
      */
     async loadAvailableAPIs() {
         try {
-            const result = await chrome.runtime.sendMessage({
-                type: APP_CONSTANTS.MESSAGE_TYPES.GET_AVAILABLE_APIS
-            });
+            let result;
+            try {
+                result = await chrome.runtime.sendMessage({
+                    type: APP_CONSTANTS.MESSAGE_TYPES.GET_AVAILABLE_APIS
+                });
+            } catch (error) {
+                console.warn('Background script hazır değil, API listesi alınamıyor:', error);
+                result = { success: false };
+            }
 
             if (result.success) {
                 const apis = result.data;
@@ -381,10 +393,16 @@ class OptionsController {
 
         try {
             // API'yi değiştir
-            const result = await chrome.runtime.sendMessage({
-                type: APP_CONSTANTS.MESSAGE_TYPES.SWITCH_API,
-                data: { apiId: selectedAPI }
-            });
+            let result;
+            try {
+                result = await chrome.runtime.sendMessage({
+                    type: APP_CONSTANTS.MESSAGE_TYPES.SWITCH_API,
+                    data: { apiId: selectedAPI }
+                });
+            } catch (error) {
+                console.warn('Background script hazır değil, API değiştirilemiyor:', error);
+                result = { success: false };
+            }
 
             if (result.success) {
                 // API anahtarını yükle
@@ -396,9 +414,15 @@ class OptionsController {
                 this.elements.apiKey.value = apiKey || '';
 
                 // API bilgilerini al
-                const selectedAPIData = await chrome.runtime.sendMessage({
-                    type: APP_CONSTANTS.MESSAGE_TYPES.GET_CURRENT_API
-                });
+                let selectedAPIData;
+                try {
+                    selectedAPIData = await chrome.runtime.sendMessage({
+                        type: APP_CONSTANTS.MESSAGE_TYPES.GET_CURRENT_API
+                    });
+                } catch (error) {
+                    console.warn('Background script hazır değil, API bilgileri alınamıyor:', error);
+                    selectedAPIData = { success: false };
+                }
 
                 if (selectedAPIData.success) {
                     this.updateAPIKeyDescription(selectedAPIData.data.name);
@@ -440,16 +464,16 @@ class OptionsController {
      */
     async loadAPIUsage() {
         try {
-            const compatibilityLayer = window.compatibilityLayer || chrome;
-            const result = await compatibilityLayer.getStorageData([APP_CONSTANTS.STORAGE_KEYS.STATISTICS]);
+            // Options sayfasında doğrudan chrome.storage API'sini kullan
+            const result = await chrome.storage.local.get([APP_CONSTANTS.STORAGE_KEYS.STATISTICS]);
             const stats = result[APP_CONSTANTS.STORAGE_KEYS.STATISTICS] || { daily: 0, monthly: 0 };
-            
+
             const todayUsage = this.elements.apiUsage.querySelector('.usage-item:first-child .usage-value');
             const monthlyUsage = this.elements.apiUsage.querySelector('.usage-item:last-child .usage-value');
-            
+
             todayUsage.textContent = `${stats.daily} çeviri`;
             monthlyUsage.textContent = `${stats.monthly} çeviri`;
-            
+
         } catch (error) {
             console.error('API kullanım istatistikleri yükleme hatası:', error);
         }
@@ -492,14 +516,19 @@ class OptionsController {
                     [storageKey]: this.elements.apiKey.value.trim()
                 });
 
-                // API anahtarını background'a gönder
-                await chrome.runtime.sendMessage({
-                    type: APP_CONSTANTS.MESSAGE_TYPES.SET_API_KEY,
-                    data: {
-                        apiId: this.elements.apiProvider.value,
-                        apiKey: this.elements.apiKey.value.trim()
-                    }
-                });
+                // API anahtarını background'a gönder (opsiyonel - background hazır değilse uyarı ver ama kaydetmeye devam et)
+                try {
+                    await chrome.runtime.sendMessage({
+                        type: APP_CONSTANTS.MESSAGE_TYPES.SET_API_KEY,
+                        data: {
+                            apiId: this.elements.apiProvider.value,
+                            apiKey: this.elements.apiKey.value.trim()
+                        }
+                    });
+                } catch (runtimeError) {
+                    console.warn('Background script hazır değil, ancak ayarlar kaydedildi:', runtimeError);
+                    // Bu kritik değil, ayarlar zaten local storage'a kaydedildi
+                }
             }
             
             // Ayarları kaydet
@@ -656,6 +685,21 @@ class OptionsController {
 
 // Options sayfasını başlat
 document.addEventListener('DOMContentLoaded', () => {
+    // Basit test - chrome API mevcut mu kontrol et
+    if (typeof chrome === 'undefined' || !chrome.storage) {
+        console.error('Chrome API mevcut değil!');
+        alert('Chrome extension API\'si mevcut değil. Bu sayfayı tarayıcı extension\'ı içinden açtığınızdan emin olun.');
+        return;
+    }
+
+    // APP_CONSTANTS mevcut mu kontrol et
+    if (typeof APP_CONSTANTS === 'undefined') {
+        console.error('APP_CONSTANTS yüklenmedi!');
+        alert('Uygulama sabitleri yüklenemedi. Sayfa yeniden yükleniyor...');
+        location.reload();
+        return;
+    }
+
     window.optionsController = new OptionsController();
 });
 
