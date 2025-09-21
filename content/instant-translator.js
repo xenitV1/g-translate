@@ -433,31 +433,40 @@ class InstantTranslator {
      */
     positionPopup() {
         if (!this.currentSelection) return;
-        
+
         const rect = this.currentSelection.rect;
         const popup = this.popup;
         const popupRect = popup.getBoundingClientRect();
-        
+
         // Viewport boyutları
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        
-        // Pozisyon hesapla
-        let left = rect.left + (rect.width / 2) - (popupRect.width / 2);
-        let top = rect.bottom + this.popupOffset;
-        
-        // Viewport sınırlarını kontrol et
-        if (left < 10) {
-            left = 10;
-        } else if (left + popupRect.width > viewportWidth - 10) {
-            left = viewportWidth - popupRect.width - 10;
+
+        let left, top;
+
+        if (rect && rect.left !== undefined && rect.top !== undefined && rect.width !== undefined && rect.bottom !== undefined) {
+            // Pozisyon hesapla - rect mevcut
+            left = rect.left + (rect.width / 2) - (popupRect.width / 2);
+            top = rect.bottom + this.popupOffset;
+
+            // Viewport sınırlarını kontrol et
+            if (left < 10) {
+                left = 10;
+            } else if (left + popupRect.width > viewportWidth - 10) {
+                left = viewportWidth - popupRect.width - 10;
+            }
+
+            if (top + popupRect.height > viewportHeight - 10) {
+                // Yukarıda göster
+                top = rect.top - popupRect.height - this.popupOffset;
+            }
+        } else {
+            // Rect mevcut değilse - merkezde göster
+            console.warn('Selection rect mevcut değil, varsayılan pozisyon kullanılıyor');
+            left = (viewportWidth - popupRect.width) / 2;
+            top = (viewportHeight - popupRect.height) / 2;
         }
-        
-        if (top + popupRect.height > viewportHeight - 10) {
-            // Yukarıda göster
-            top = rect.top - popupRect.height - this.popupOffset;
-        }
-        
+
         // Pozisyonu ayarla
         popup.style.left = `${left}px`;
         popup.style.top = `${top}px`;
@@ -480,6 +489,9 @@ class InstantTranslator {
             if (response.success) {
                 const language = response.data;
                 detectionContent.textContent = `Kaynak dil: ${language.name}`;
+            } else if (response.contextLost) {
+                detectionContent.textContent = 'Extension bağlantısı kesildi';
+                this.showError('Extension yeniden yüklendi. Lütfen sayfayı yenileyin.');
             } else {
                 detectionContent.textContent = 'Dil tespit edilemedi';
             }
@@ -513,6 +525,8 @@ class InstantTranslator {
             
             if (response.success) {
                 this.showTranslationResult(response.data);
+            } else if (response.contextLost) {
+                this.showError('Extension yeniden yüklendi. Lütfen sayfayı yenileyin.');
             } else {
                 this.showError(response.error || 'Çeviri başarısız oldu');
             }
@@ -636,9 +650,39 @@ class InstantTranslator {
     async sendMessageToBackground(message) {
         try {
             const compatibilityLayer = window.compatibilityLayer || chrome;
-            return await compatibilityLayer.runtime.sendMessage(message);
+
+            // Extension context kontrolü
+            if (!compatibilityLayer || !compatibilityLayer.runtime) {
+                throw new Error('Extension runtime mevcut değil');
+            }
+
+            // Promise ile mesaj gönder
+            return new Promise((resolve, reject) => {
+                compatibilityLayer.runtime.sendMessage(message, (response) => {
+                    // Chrome runtime error kontrolü
+                    if (chrome.runtime.lastError) {
+                        reject(new Error(chrome.runtime.lastError.message));
+                    } else {
+                        resolve(response);
+                    }
+                });
+            });
+
         } catch (error) {
             console.error('Background mesaj gönderme hatası:', error);
+
+            // Extension context invalidated hatası için özel kontrol
+            if (error.message.includes('Extension context invalidated') ||
+                error.message.includes('context invalidated')) {
+                console.warn('Extension context kaybı tespit edildi. Sayfa yenileniyor...');
+                // Sayfayı yenilemek yerine kullanıcıya bilgi ver
+                return {
+                    success: false,
+                    error: 'Extension yeniden yüklendi. Lütfen sayfayı yenileyin.',
+                    contextLost: true
+                };
+            }
+
             return { success: false, error: error.message };
         }
     }
