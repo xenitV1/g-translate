@@ -178,11 +178,9 @@ class GeminiAPIHandler extends BaseAPIHandler {
                 lang => lang.code === sourceLang
             );
 
-            const translationPrompt = `Bu metni ${targetLangObj.name} diline çevir:
-            Kaynak dil: ${sourceLangObj ? sourceLangObj.name : sourceLang}
-            Hedef dil: ${targetLangObj.name}
-            Metin: "${text}"
-            Çeviri:`;
+            const translationPrompt = `Bu metni ${targetLangObj.name} diline çevir. Metnin ana yapısını ve anlamını bozma, direkt kullanıcının anlayacağı dile çevir. Başka bir şey ekleme veya çıkarma, sadece çeviriyi döndür.
+
+Metin: "${text}"`;
 
             // Gemini ile çevir
             const response = await this.callGeminiAPI(translationPrompt);

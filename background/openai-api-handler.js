@@ -188,11 +188,11 @@ class OpenAIAPIHandler extends BaseAPIHandler {
             const messages = [
                 {
                     role: 'system',
-                    content: `Sen profesyonel bir çevirmensin. Metinleri doğru ve doğal bir şekilde çevirirsin. Sadece çeviriyi döndür, başka açıklama yapma.`
+                    content: `Sen bir çeviri uzmanısın. Metnin ana yapısını ve anlamını bozma, direkt kullanıcının anlayacağı dile çevir. Başka bir şey ekleme veya çıkarma, sadece çeviriyi döndür.`
                 },
                 {
                     role: 'user',
-                    content: `${sourceLangObj ? sourceLangObj.name : sourceLang} dilindeki bu metni ${targetLangObj.name} diline çevir: "${text}"`
+                    content: `Bu metni ${targetLangObj.name} diline çevir: "${text}"`
                 }
             ];
 

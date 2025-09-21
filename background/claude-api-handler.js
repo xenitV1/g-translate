@@ -179,13 +179,9 @@ class ClaudeAPIHandler extends BaseAPIHandler {
                 lang => lang.code === sourceLang
             );
 
-            const prompt = `Sen profesyonel bir çevirmensin. Metinleri doğru ve doğal bir şekilde çevirirsin. Sadece çeviriyi döndür, başka açıklama yapma.
+            const prompt = `Bu metni ${targetLangObj.name} diline çevir. Metnin ana yapısını ve anlamını bozma, direkt kullanıcının anlayacağı dile çevir. Başka bir şey ekleme veya çıkarma, sadece çeviriyi döndür.
 
-            Görev: ${sourceLangObj ? sourceLangObj.name : sourceLang} dilindeki metni ${targetLangObj.name} diline çevir.
-
-            Metin: "${text}"
-
-            Çeviri:`;
+Metin: "${text}"`;
 
             // Claude ile çevir
             const response = await this.callClaudeAPI(prompt);
