@@ -49,7 +49,7 @@ class BackgroundService {
             await this.loadCompatibilityLayer();
 
             // Storage manager'ı başlat (önce settings için)
-            this.storageManager = new StorageManager();
+            this.storageManager = new StorageManager(self.compatibilityLayer);
 
             // API manager'ı başlat
             this.apiManager = apiManager;
@@ -84,14 +84,26 @@ class BackgroundService {
             // Browser detection
             const isFirefox = typeof browser !== 'undefined' && browser.runtime;
             const isChrome = typeof chrome !== 'undefined' && chrome.runtime;
-            
+
             // API seçimi - Chrome öncelikli, Firefox fallback
             const api = browserAPI || (isChrome ? chrome : (isFirefox ? browser : chrome));
-            
+
             if (!api) {
                 throw new Error('No browser API available');
             }
-            
+
+            // Service Worker context kontrolü
+            const isServiceWorker = typeof self !== 'undefined' &&
+                                   self instanceof ServiceWorkerGlobalScope;
+
+            console.log('Browser API detection:', {
+                isChrome,
+                isFirefox,
+                isServiceWorker,
+                hasStorage: !!(api.storage && api.storage.local),
+                hasRuntime: !!api.runtime
+            });
+
             self.compatibilityLayer = {
                 runtime: api.runtime,
                 storage: api.storage,
@@ -101,7 +113,8 @@ class BackgroundService {
                 notifications: api.notifications,
                 alarms: api.alarms,
                 isChrome: isChrome,
-                isFirefox: isFirefox
+                isFirefox: isFirefox,
+                isServiceWorker: isServiceWorker
             };
         }
     }
@@ -220,6 +233,10 @@ class BackgroundService {
 
                 case APP_CONSTANTS.MESSAGE_TYPES.GET_CURRENT_API:
                     response = await this.handleGetCurrentAPI(message.data, sender);
+                    break;
+
+                case 'GET_SELECTED_TEXT':
+                    response = await this.handleGetSelectedText(message.data, sender);
                     break;
 
                 default:
@@ -871,6 +888,33 @@ class BackgroundService {
             return { success: true, data: currentAPI };
         } catch (error) {
             console.error('Geçerli API alma hatası:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Seçili metni alma işleyici
+     */
+    async handleGetSelectedText(data, sender) {
+        try {
+            const compatibilityLayer = self.compatibilityLayer || chrome;
+
+            // Aktif tab'ı al
+            const tabs = await compatibilityLayer.tabs.query({ active: true, currentWindow: true });
+            if (tabs.length === 0) {
+                return { success: false, error: 'Aktif tab bulunamadı' };
+            }
+
+            const activeTab = tabs[0];
+
+            // Content script'e mesaj gönder
+            const response = await compatibilityLayer.tabs.sendMessage(activeTab.id, {
+                type: 'GET_SELECTED_TEXT'
+            });
+
+            return { success: true, text: response?.text || null };
+        } catch (error) {
+            console.error('Seçili metin alma hatası:', error);
             return { success: false, error: error.message };
         }
     }
