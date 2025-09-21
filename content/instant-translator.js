@@ -557,15 +557,20 @@ class InstantTranslator {
     showTranslationResult(translation) {
         const resultDiv = this.popup.querySelector('.translation-result');
         const resultContent = this.popup.querySelector('.result-content');
-        
+
         resultContent.textContent = translation.translatedText;
         resultDiv.style.display = 'block';
-        
+
         // Copy butonunu etkinleştir
         this.popup.querySelector('.copy-btn').disabled = false;
-        
+
         // Auto-hide'ı durdur
         this.clearAutoHide();
+
+        // Popup boyutu değiştiği için pozisyonu güncelle
+        setTimeout(() => {
+            this.positionPopup();
+        }, 100);
     }
 
     /**

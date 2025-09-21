@@ -265,10 +265,10 @@ class ContentScriptController {
      */
     handleScroll() {
         // Popup pozisyonunu güncelle
-        if (this.instantTranslator && this.instantTranslator.isVisible()) {
-            this.instantTranslator.updatePosition();
+        if (this.instantTranslator && this.instantTranslator.isPopupVisible()) {
+            this.instantTranslator.positionPopup();
         }
-        
+
         if (this.translationOverlay && this.translationOverlay.isVisible()) {
             this.translationOverlay.updatePosition();
         }
