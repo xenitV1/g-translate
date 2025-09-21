@@ -137,12 +137,16 @@ class ContentScriptController {
         }
         
         if (selectedText.length > 0) {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+
             this.currentSelection = {
                 text: selectedText,
-                range: selection.getRangeAt(0),
+                range: range,
+                rect: rect,
                 timestamp: Date.now()
             };
-            
+
             // Instant translation popup'ı göster
             this.showInstantTranslationPopup();
         }
