@@ -239,6 +239,10 @@ class BackgroundService {
                     response = await this.handleGetSelectedText(message.data, sender);
                     break;
 
+                case 'PING':
+                    response = { success: true, message: 'pong' };
+                    break;
+
                 default:
                     console.log('Bilinmeyen mesaj tipi:', message.type);
             }

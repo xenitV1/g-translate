@@ -45,10 +45,10 @@ class ContentScriptController {
             // Browser detection
             const isFirefox = typeof browser !== 'undefined' && browser.runtime;
             const isChrome = typeof chrome !== 'undefined' && chrome.runtime;
-            
+
             // API seçimi - Chrome öncelikli, Firefox fallback
             const api = isChrome ? chrome : (isFirefox ? browser : chrome);
-            
+
             window.compatibilityLayer = {
                 runtime: api.runtime,
                 storage: api.storage,
@@ -62,35 +62,77 @@ class ContentScriptController {
     }
 
     /**
+     * Extension context kontrolü
+     */
+    async checkExtensionContext() {
+        const compatibilityLayer = window.compatibilityLayer || chrome;
+
+        if (!compatibilityLayer || !compatibilityLayer.runtime) {
+            throw new Error('Extension context invalidated');
+        }
+
+        if (!compatibilityLayer.runtime.id) {
+            throw new Error('Extension context invalidated');
+        }
+
+        // Basit bir test mesajı göndererek context'i kontrol et
+        try {
+            await new Promise((resolve, reject) => {
+                compatibilityLayer.runtime.sendMessage({ type: 'PING' }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        reject(new Error(chrome.runtime.lastError.message));
+                    } else {
+                        resolve(response);
+                    }
+                });
+            });
+        } catch (error) {
+            if (error.message.includes('Extension context invalidated')) {
+                throw error;
+            }
+            // Diğer hatalar için devam et (background henüz hazır olmayabilir)
+        }
+    }
+
+    /**
      * Component'leri başlat
      */
     async initializeComponents() {
         if (this.isInitialized) return;
-        
+
         try {
+            // Extension context kontrolü
+            await this.checkExtensionContext();
+
             // Selection handler'ı başlat
             this.selectionHandler = new SelectionHandler();
-            
+
             // Instant translator'ı başlat
             this.instantTranslator = new InstantTranslator();
-            
+
             // Context menu'yu başlat
             this.contextMenu = new ContextMenuHandler();
-            
+
             // Translation overlay'ı başlat
             this.translationOverlay = new TranslationOverlay();
-            
+
             // Event listener'ları ekle
             this.attachEventListeners();
-            
+
             // Background script ile iletişimi başlat
             this.setupBackgroundCommunication();
-            
+
             this.isInitialized = true;
             console.log('Content script başlatıldı');
-            
+
         } catch (error) {
             console.error('Component başlatma hatası:', error);
+
+            // Extension context kaybı durumunda sayfayı yenile
+            if (error.message.includes('Extension context invalidated')) {
+                console.warn('Extension context kaybı tespit edildi, sayfa yenileniyor...');
+                setTimeout(() => window.location.reload(), 1000);
+            }
         }
     }
 
