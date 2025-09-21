@@ -18,12 +18,6 @@ class OpenAIAPIHandler extends BaseAPIHandler {
       frequencyPenalty: 0.0,
       presencePenalty: 0.0,
 
-      // Rate limiting
-      rateLimit: {
-        requestsPerMinute: 60,
-        requestsPerDay: 10000,
-      },
-
       // Supported languages
       supportedLanguages: [
         { code: "auto", name: "Otomatik Algıla", nativeName: "Auto Detect" },
@@ -46,7 +40,6 @@ class OpenAIAPIHandler extends BaseAPIHandler {
       errorMessages: {
         apiKeyMissing: "OpenAI API anahtarı bulunamadı",
         apiKeyInvalid: "Geçersiz OpenAI API anahtarı",
-        rateLimitExceeded: "OpenAI rate limit aşıldı",
         networkError: "OpenAI ağ hatası",
         translationError: "OpenAI çeviri hatası",
       },
@@ -89,9 +82,6 @@ class OpenAIAPIHandler extends BaseAPIHandler {
       if (cached) {
         return cached;
       }
-
-      // Rate limiting
-      await this.rateLimiter.checkLimit();
 
       const messages = [
         {
@@ -170,9 +160,6 @@ class OpenAIAPIHandler extends BaseAPIHandler {
       if (cached) {
         return cached;
       }
-
-      // Rate limiting
-      await this.rateLimiter.checkLimit();
 
       let sourceLang = sourceLanguage;
 

@@ -5,7 +5,7 @@
 
 // Import required modules using ES modules for service worker compatibility
 import constants from "../utils/constants.js";
-import { BaseAPIHandler, RateLimiter, TranslationCache } from "./base-api-handler.js";
+import { BaseAPIHandler, TranslationCache } from "./base-api-handler.js";
 import { GeminiAPIHandler } from "./gemini-api-handler.js";
 import { OpenAIAPIHandler } from "./openai-api-handler.js";
 import { ClaudeAPIHandler } from "./claude-api-handler.js";
@@ -19,7 +19,6 @@ const APP_CONSTANTS = constants;
 if (typeof self !== "undefined") {
   self.APP_CONSTANTS = APP_CONSTANTS;
   self.BaseAPIHandler = BaseAPIHandler;
-  self.RateLimiter = RateLimiter;
   self.TranslationCache = TranslationCache;
   self.GeminiAPIHandler = GeminiAPIHandler;
   self.OpenAIAPIHandler = OpenAIAPIHandler;
@@ -51,6 +50,13 @@ class BackgroundService {
     this.storageManager = null;
     this.isInitialized = false;
 
+    // Rate limit takip sistemi (sınırlama yok, sadece takip)
+    this.requestCounters = {
+      gemini: { daily: 0, total: 0, lastReset: new Date().toDateString() },
+      openai: { daily: 0, total: 0, lastReset: new Date().toDateString() },
+      claude: { daily: 0, total: 0, lastReset: new Date().toDateString() }
+    };
+
     this.init();
   }
 
@@ -77,6 +83,9 @@ class BackgroundService {
 
       // API key'i yükle ve ayarla
       await this.loadAndSetAPIKey(selectedAPI);
+
+      // Request counter'ları yükle
+      await this.loadRequestCounters();
 
       // Event listener'ları ekle
       this.attachEventListeners();
@@ -250,6 +259,10 @@ class BackgroundService {
           response = await this.handleSwitchAPI(message.data, sender);
           break;
 
+        case APP_CONSTANTS.MESSAGE_TYPES.GET_REQUEST_COUNTERS:
+          response = { success: true, data: this.getRequestCounters() };
+          break;
+
         case APP_CONSTANTS.MESSAGE_TYPES.SET_API_KEY:
           response = await this.handleSetAPIKey(message.data, sender);
           break;
@@ -299,18 +312,19 @@ class BackgroundService {
         sourceLanguage,
       );
 
+      // Request counter'ı artır (sadece takip için, sınırlama yok)
+      const currentAPI = this.apiManager.getCurrentHandler();
+      if (currentAPI) {
+        const apiId = currentAPI.getId();
+        await this.incrementRequestCounter(apiId);
+      }
+
       // Geçmişe kaydet
       await this.storageManager.saveTranslation(result);
 
       return { success: true, data: result };
     } catch (error) {
       console.error("Çeviri işlemi hatası:", error);
-      
-      // Rate limit hatası durumunda özel bildirim gönder
-      if (error.message.includes("Rate limit") || error.message.includes("limit")) {
-        await this.showRateLimitNotification(error.message);
-      }
-      
       return { success: false, error: error.message };
     }
   }
@@ -329,15 +343,16 @@ class BackgroundService {
       // API manager ile dil tespiti yap
       const result = await this.apiManager.detectLanguage(text);
 
+      // Request counter'ı artır (sadece takip için, sınırlama yok)
+      const currentAPI = this.apiManager.getCurrentHandler();
+      if (currentAPI) {
+        const apiId = currentAPI.getId();
+        await this.incrementRequestCounter(apiId);
+      }
+
       return { success: true, data: result };
     } catch (error) {
       console.error("Dil tespiti hatası:", error);
-      
-      // Rate limit hatası durumunda özel bildirim gönder
-      if (error.message.includes("Rate limit") || error.message.includes("limit")) {
-        await this.showRateLimitNotification(error.message);
-      }
-      
       return { success: false, error: error.message };
     }
   }
@@ -759,34 +774,6 @@ class BackgroundService {
     }
   }
 
-  /**
-   * Rate limit bildirimi göster
-   */
-  async showRateLimitNotification(errorMessage) {
-    try {
-      const title = "🚫 API Limit Aşıldı";
-      let message = "Günlük çeviri limitiniz aşıldı. ";
-      
-      // Gemini API için özel mesaj
-      if (errorMessage.includes("Günlük istek limiti aşıldı")) {
-        message += "Google Gemini API'nin ücretsiz tier'ında günlük 50 istek limiti bulunmaktadır. ";
-        message += "Limit yarın sıfırlanacak veya ücretli plana geçebilirsiniz.";
-      } else if (errorMessage.includes("Saatlik istek limiti aşıldı")) {
-        message += "Saatlik istek limitiniz aşıldı. Bir saat sonra tekrar deneyebilirsiniz.";
-      } else {
-        message += "Lütfen daha sonra tekrar deneyin veya farklı bir API kullanın.";
-      }
-      
-      message += "\n\n💡 Öneriler:\n";
-      message += "• Cache'lenmiş çevirileri kullanın\n";
-      message += "• Farklı bir AI API'si deneyin\n";
-      message += "• Ayarlardan API değiştirin";
-      
-      await this.showNotification(title, message, "basic");
-    } catch (error) {
-      console.error("Rate limit bildirimi hatası:", error);
-    }
-  }
 
   /**
    * Popup'a mesaj gönder
@@ -1307,6 +1294,89 @@ class BackgroundService {
     } catch (error) {
       console.error("API key yükleme hatası:", error);
     }
+  }
+
+  /**
+   * Request counter'ları yükle
+   */
+  async loadRequestCounters() {
+    try {
+      const compatibilityLayer = self.compatibilityLayer || browserAPI;
+      if (compatibilityLayer && compatibilityLayer.storage && compatibilityLayer.storage.local) {
+        const result = await compatibilityLayer.storage.local.get(['requestCounters']);
+        const savedCounters = result.requestCounters;
+
+        if (savedCounters) {
+          const today = new Date().toDateString();
+
+          // Her API için counter'ları güncelle
+          Object.keys(this.requestCounters).forEach(apiId => {
+            if (savedCounters[apiId]) {
+              const saved = savedCounters[apiId];
+
+              // Günlük counter'ı sıfırla (eğer gün değiştiyse)
+              if (saved.lastReset !== today) {
+                this.requestCounters[apiId].daily = 0;
+                this.requestCounters[apiId].lastReset = today;
+              } else {
+                this.requestCounters[apiId].daily = saved.daily || 0;
+                this.requestCounters[apiId].lastReset = saved.lastReset;
+              }
+
+              // Toplam counter'ı koru
+              this.requestCounters[apiId].total = saved.total || 0;
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Request counter'ları yükleme hatası:", error);
+    }
+  }
+
+  /**
+   * Request counter'ları kaydet
+   */
+  async saveRequestCounters() {
+    try {
+      const compatibilityLayer = self.compatibilityLayer || browserAPI;
+      if (compatibilityLayer && compatibilityLayer.storage && compatibilityLayer.storage.local) {
+        await compatibilityLayer.storage.local.set({
+          requestCounters: this.requestCounters
+        });
+      }
+    } catch (error) {
+      console.error("Request counter'ları kaydetme hatası:", error);
+    }
+  }
+
+  /**
+   * Request counter'ı artır (sadece takip için)
+   */
+  async incrementRequestCounter(apiId) {
+    if (!this.requestCounters[apiId]) return;
+
+    const today = new Date().toDateString();
+
+    // Gün değiştiyse günlük counter'ı sıfırla
+    if (this.requestCounters[apiId].lastReset !== today) {
+      this.requestCounters[apiId].daily = 0;
+      this.requestCounters[apiId].lastReset = today;
+    }
+
+    // Counter'ları artır
+    this.requestCounters[apiId].daily++;
+    this.requestCounters[apiId].total++;
+
+    // Kaydet
+    await this.saveRequestCounters();
+  }
+
+  /**
+   * Request counter durumunu al
+   */
+  getRequestCounters() {
+    return this.requestCounters;
   }
 
   /**

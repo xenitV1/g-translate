@@ -6,7 +6,6 @@
 class BaseAPIHandler {
   constructor(config) {
     this.config = config;
-    this.rateLimiter = new RateLimiter();
     this.cache = new TranslationCache();
     this.isInitialized = false;
   }
@@ -154,35 +153,6 @@ class BaseAPIHandler {
   }
 }
 
-/**
- * Rate Limiter - Tüm API'ler için ortak
- */
-class RateLimiter {
-  constructor() {
-    this.requests = [];
-  }
-
-  async checkLimit(requestsPerMinute = 60) {
-    const now = Date.now();
-    const oneMinuteAgo = now - 60000;
-
-    // Eski istekleri temizle
-    this.requests = this.requests.filter((time) => time > oneMinuteAgo);
-
-    // Limit kontrolü
-    if (this.requests.length >= requestsPerMinute) {
-      const oldestRequest = Math.min(...this.requests);
-      const waitTime = 60000 - (now - oldestRequest);
-
-      if (waitTime > 0) {
-        await new Promise((resolve) => setTimeout(resolve, waitTime));
-      }
-    }
-
-    // Yeni istek kaydet
-    this.requests.push(now);
-  }
-}
 
 /**
  * Translation Cache - Tüm API'ler için ortak
@@ -241,11 +211,10 @@ class TranslationCache {
 }
 
 // Export for ES modules
-export { BaseAPIHandler, RateLimiter, TranslationCache };
+export { BaseAPIHandler, TranslationCache };
 
 // Make classes globally available for service worker environment
 if (typeof self !== "undefined") {
   self.BaseAPIHandler = BaseAPIHandler;
-  self.RateLimiter = RateLimiter;
   self.TranslationCache = TranslationCache;
 }

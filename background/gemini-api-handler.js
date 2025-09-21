@@ -17,14 +17,6 @@ class GeminiAPIHandler extends BaseAPIHandler {
       topK: 40,
       maxTokens: 1000,
 
-      // Rate limiting - Google Gemini Free Tier limits (Updated 2024)
-      rateLimit: {
-        requestsPerMinute: 10,  // Gemini 2.5 Flash free tier limit
-        requestsPerDay: 250,    // Gemini 2.5 Flash free tier limit
-        requestsPerHour: 50,    // Additional safety limit
-        tokensPerMinute: 250000 // Token limit for free tier
-      },
-
       // Supported languages
       supportedLanguages: [
         { code: "auto", name: "Otomatik Algıla", nativeName: "Auto Detect" },
@@ -47,7 +39,6 @@ class GeminiAPIHandler extends BaseAPIHandler {
       errorMessages: {
         apiKeyMissing: "API anahtarı bulunamadı",
         apiKeyInvalid: "Geçersiz API anahtarı",
-        rateLimitExceeded: "Rate limit aşıldı",
         networkError: "Ağ hatası",
         translationError: "Çeviri hatası",
       },
@@ -56,10 +47,6 @@ class GeminiAPIHandler extends BaseAPIHandler {
     super(config);
     this.retryCount = 0;
     this.maxRetries = 3;
-    this.dailyRequestCount = 0;
-    this.hourlyRequestCount = 0;
-    this.lastResetDate = new Date().toDateString();
-    this.lastResetHour = new Date().getHours();
   }
 
   /**
@@ -67,121 +54,11 @@ class GeminiAPIHandler extends BaseAPIHandler {
    */
   async loadConfiguration() {
     this.config.apiKey = await this.loadApiKey();
-    await this.loadRequestCounters();
   }
 
-  /**
-   * İstek sayaçlarını yükle
-   */
-  async loadRequestCounters() {
-    try {
-      const storageKey = 'gemini_request_counters';
-      const compatibilityLayer = self.compatibilityLayer || chrome;
-      
-      if (compatibilityLayer && compatibilityLayer.storage && compatibilityLayer.storage.local) {
-        const result = await compatibilityLayer.storage.local.get([storageKey]);
-        const counters = result[storageKey] || {};
-        
-        const today = new Date().toDateString();
-        const currentHour = new Date().getHours();
-        
-        // Günlük sayaç sıfırlama
-        if (counters.lastResetDate !== today) {
-          this.dailyRequestCount = 0;
-          this.lastResetDate = today;
-        } else {
-          this.dailyRequestCount = counters.dailyRequestCount || 0;
-          this.lastResetDate = counters.lastResetDate || today;
-        }
-        
-        // Saatlik sayaç sıfırlama
-        if (counters.lastResetHour !== currentHour) {
-          this.hourlyRequestCount = 0;
-          this.lastResetHour = currentHour;
-        } else {
-          this.hourlyRequestCount = counters.hourlyRequestCount || 0;
-          this.lastResetHour = counters.lastResetHour || currentHour;
-        }
-      }
-    } catch (error) {
-      console.error("İstek sayaçları yükleme hatası:", error);
-    }
-  }
 
-  /**
-   * İstek sayaçlarını kaydet
-   */
-  async saveRequestCounters() {
-    try {
-      const storageKey = 'gemini_request_counters';
-      const compatibilityLayer = self.compatibilityLayer || chrome;
-      
-      if (compatibilityLayer && compatibilityLayer.storage && compatibilityLayer.storage.local) {
-        await compatibilityLayer.storage.local.set({
-          [storageKey]: {
-            dailyRequestCount: this.dailyRequestCount,
-            hourlyRequestCount: this.hourlyRequestCount,
-            lastResetDate: this.lastResetDate,
-            lastResetHour: this.lastResetHour,
-          }
-        });
-      }
-    } catch (error) {
-      console.error("İstek sayaçları kaydetme hatası:", error);
-    }
-  }
 
-  /**
-   * Rate limit kontrolü (gelişmiş)
-   */
-  async checkAdvancedRateLimit() {
-    const now = new Date();
-    const today = now.toDateString();
-    const currentHour = now.getHours();
-    
-    // Günlük sayaç sıfırlama
-    if (this.lastResetDate !== today) {
-      this.dailyRequestCount = 0;
-      this.lastResetDate = today;
-    }
-    
-    // Saatlik sayaç sıfırlama
-    if (this.lastResetHour !== currentHour) {
-      this.hourlyRequestCount = 0;
-      this.lastResetHour = currentHour;
-    }
-    
-    // Günlük limit kontrolü
-    if (this.dailyRequestCount >= this.config.rateLimit.requestsPerDay) {
-      const nextReset = new Date();
-      nextReset.setDate(nextReset.getDate() + 1);
-      nextReset.setHours(0, 0, 0, 0);
-      const waitTime = nextReset.getTime() - now.getTime();
-      
-      throw new Error(`Günlük istek limiti aşıldı (${this.config.rateLimit.requestsPerDay}/gün). Limit ${nextReset.toLocaleString('tr-TR')} tarihinde sıfırlanacak. Gemini 2.5 Flash free tier limiti.`);
-    }
-    
-    // Saatlik limit kontrolü
-    if (this.hourlyRequestCount >= this.config.rateLimit.requestsPerHour) {
-      const nextReset = new Date();
-      nextReset.setHours(nextReset.getHours() + 1, 0, 0, 0);
-      const waitTime = nextReset.getTime() - now.getTime();
-      
-      throw new Error(`Saatlik istek limiti aşıldı (${this.config.rateLimit.requestsPerHour}/saat). Limit ${nextReset.toLocaleString('tr-TR')} tarihinde sıfırlanacak. Gemini 2.5 Flash free tier limiti.`);
-    }
-    
-    // Dakikalık limit kontrolü (mevcut sistem)
-    await this.rateLimiter.checkLimit(this.config.rateLimit.requestsPerMinute);
-  }
 
-  /**
-   * İstek sayacını artır
-   */
-  async incrementRequestCounters() {
-    this.dailyRequestCount++;
-    this.hourlyRequestCount++;
-    await this.saveRequestCounters();
-  }
 
   /**
    * API anahtarını kontrolü
@@ -210,18 +87,12 @@ class GeminiAPIHandler extends BaseAPIHandler {
         return cached;
       }
 
-      // Gelişmiş rate limiting
-      await this.checkAdvancedRateLimit();
-
       const prompt = `Bu metnin hangi dilde yazıldığını tespit et.
             Sadece dil kodunu döndür (örn: tr, en, es, fr, de, it, pt, ru, ja, ko, zh, ar).
             Metin: "${text}"
             Dil kodu:`;
 
       const response = await this.callGeminiAPI(prompt);
-      
-      // İstek sayacını artır
-      await this.incrementRequestCounters();
       
       const detectedLang = response.text.trim().toLowerCase();
 
@@ -289,9 +160,6 @@ class GeminiAPIHandler extends BaseAPIHandler {
         return cached;
       }
 
-      // Gelişmiş rate limiting
-      await this.checkAdvancedRateLimit();
-
       let sourceLang = sourceLanguage;
 
       // Kaynak dil tespiti
@@ -315,9 +183,6 @@ Metin: "${text}"`;
 
       // Gemini ile çevir
       const response = await this.callGeminiAPI(translationPrompt);
-      
-      // İstek sayacını artır
-      await this.incrementRequestCounters();
 
       const result = {
         originalText: text,
@@ -460,14 +325,7 @@ Metin: "${text}"`;
     }
 
     if (error.message.includes("429") || error.message.includes("quota")) {
-      // Detaylı rate limit hatası
-      if (error.message.includes("Günlük istek limiti aşıldı")) {
-        return new Error(error.message);
-      }
-      if (error.message.includes("Saatlik istek limiti aşıldı")) {
-        return new Error(error.message);
-      }
-      return new Error(`Rate limit aşıldı. Günlük limit: ${this.config.rateLimit.requestsPerDay} istek (Gemini 2.5 Flash free tier). Kalan: ${this.config.rateLimit.requestsPerDay - this.dailyRequestCount} istek.`);
+      return new Error(`API kota limiti aşıldı. Lütfen daha sonra tekrar deneyin.`);
     }
 
     if (error.message.includes("network") || error.message.includes("fetch")) {
@@ -477,42 +335,7 @@ Metin: "${text}"`;
     return new Error(this.config.errorMessages.translationError);
   }
 
-  /**
-   * Rate limit durumu bilgisi
-   */
-  getRateLimitStatus() {
-    return {
-      daily: {
-        used: this.dailyRequestCount,
-        limit: this.config.rateLimit.requestsPerDay,
-        remaining: this.config.rateLimit.requestsPerDay - this.dailyRequestCount,
-        resetTime: this.getNextResetTime('daily')
-      },
-      hourly: {
-        used: this.hourlyRequestCount,
-        limit: this.config.rateLimit.requestsPerHour,
-        remaining: this.config.rateLimit.requestsPerHour - this.hourlyRequestCount,
-        resetTime: this.getNextResetTime('hourly')
-      }
-    };
-  }
 
-  /**
-   * Sonraki sıfırlama zamanını hesapla
-   */
-  getNextResetTime(type) {
-    const now = new Date();
-    const nextReset = new Date();
-    
-    if (type === 'daily') {
-      nextReset.setDate(nextReset.getDate() + 1);
-      nextReset.setHours(0, 0, 0, 0);
-    } else if (type === 'hourly') {
-      nextReset.setHours(nextReset.getHours() + 1, 0, 0, 0);
-    }
-    
-    return nextReset.toLocaleString('tr-TR');
-  }
 }
 
 // Export for ES modules

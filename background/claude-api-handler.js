@@ -17,12 +17,6 @@ class ClaudeAPIHandler extends BaseAPIHandler {
       topP: 1.0,
       topK: 250,
 
-      // Rate limiting
-      rateLimit: {
-        requestsPerMinute: 60,
-        requestsPerDay: 5000,
-      },
-
       // Supported languages
       supportedLanguages: [
         { code: "auto", name: "Otomatik Algıla", nativeName: "Auto Detect" },
@@ -45,7 +39,6 @@ class ClaudeAPIHandler extends BaseAPIHandler {
       errorMessages: {
         apiKeyMissing: "Claude API anahtarı bulunamadı",
         apiKeyInvalid: "Geçersiz Claude API anahtarı",
-        rateLimitExceeded: "Claude rate limit aşıldı",
         networkError: "Claude ağ hatası",
         translationError: "Claude çeviri hatası",
       },
@@ -88,9 +81,6 @@ class ClaudeAPIHandler extends BaseAPIHandler {
       if (cached) {
         return cached;
       }
-
-      // Rate limiting
-      await this.rateLimiter.checkLimit();
 
       const prompt = `Sen bir dil tespit uzmanısın. Verilen metnin hangi dilde yazıldığını tespit et ve sadece dil kodunu döndür (örn: tr, en, es, fr, de, it, pt, ru, ja, ko, zh, ar).
 
@@ -163,9 +153,6 @@ class ClaudeAPIHandler extends BaseAPIHandler {
       if (cached) {
         return cached;
       }
-
-      // Rate limiting
-      await this.rateLimiter.checkLimit();
 
       let sourceLang = sourceLanguage;
 

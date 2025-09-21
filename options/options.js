@@ -742,9 +742,9 @@ class OptionsController {
 
       // API kullanım istatistiklerini yükle
       await this.loadAPIUsage();
-      
-      // Rate limit durumunu yükle
-      await this.loadRateLimitStatus();
+
+      // Request counters'ı yükle
+      await this.loadRequestCounters();
     } catch (error) {
       console.error("API durumu kontrol hatası:", error);
       this.updateAPIStatus("error", "API durumu kontrol edilemedi");
@@ -1028,88 +1028,80 @@ class OptionsController {
   }
 
   /**
-   * Rate limit durumunu yükle
+   * Request counters'ı yükle
    */
-  async loadRateLimitStatus() {
+  async loadRequestCounters() {
     try {
-      // Gemini API için rate limit durumunu al
-      const result = await chrome.storage.local.get(['gemini_request_counters']);
-      const counters = result.gemini_request_counters || {
-        dailyRequestCount: 0,
-        hourlyRequestCount: 0,
-        lastResetDate: new Date().toDateString(),
-        lastResetHour: new Date().getHours()
-      };
+      // Background script'ten request counters'ı al
+      const result = await chrome.runtime.sendMessage({
+        type: APP_CONSTANTS.MESSAGE_TYPES.GET_REQUEST_COUNTERS,
+      });
 
-      // Rate limit durumunu göster
-      this.updateRateLimitDisplay(counters);
+      if (result.success) {
+        const counters = result.data;
+        // Request counters'ı göster
+        this.updateRequestCountersDisplay(counters);
+      } else {
+        console.warn("Request counters alınamadı:", result.error);
+      }
     } catch (error) {
-      console.error("Rate limit durumu yükleme hatası:", error);
+      console.error("Request counters yükleme hatası:", error);
     }
   }
 
   /**
-   * Rate limit görünümünü güncelle
+   * Request counters görünümünü güncelle
    */
-  updateRateLimitDisplay(counters) {
-    const dailyUsed = counters.dailyRequestCount || 0;
-    const hourlyUsed = counters.hourlyRequestCount || 0;
-    const dailyLimit = 250; // Gemini 2.5 Flash free tier (Updated 2024)
-    const hourlyLimit = 50; // Updated safety limit
+  updateRequestCountersDisplay(counters) {
+    // Tüm API'ler için request counters'ı göster
+    const apiList = Object.keys(counters);
+    let countersHtml = '';
 
-    // Günlük limit
-    const dailyPercentage = Math.min((dailyUsed / dailyLimit) * 100, 100);
-    this.elements.dailyLimit.textContent = `${dailyUsed}/${dailyLimit}`;
-    this.elements.dailyProgress.style.width = `${dailyPercentage}%`;
-    
-    // Saatlik limit
-    const hourlyPercentage = Math.min((hourlyUsed / hourlyLimit) * 100, 100);
-    this.elements.hourlyLimit.textContent = `${hourlyUsed}/${hourlyLimit}`;
-    this.elements.hourlyProgress.style.width = `${hourlyPercentage}%`;
+    apiList.forEach(apiId => {
+      const apiCounters = counters[apiId];
+      const apiName = apiId === 'gemini' ? 'Google Gemini' :
+                     apiId === 'openai' ? 'OpenAI GPT' :
+                     apiId === 'claude' ? 'Anthropic Claude' : apiId;
 
-    // Reset zamanları
-    const now = new Date();
-    const nextDay = new Date(now);
-    nextDay.setDate(nextDay.getDate() + 1);
-    nextDay.setHours(0, 0, 0, 0);
-    
-    const nextHour = new Date(now);
-    nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+      countersHtml += `
+        <div class="api-counter-item">
+          <div class="api-name">${apiName}</div>
+          <div class="counter-stats">
+            <div class="counter-row">
+              <span class="counter-label">Günlük:</span>
+              <span class="counter-value">${apiCounters.daily}</span>
+            </div>
+            <div class="counter-row">
+              <span class="counter-label">Toplam:</span>
+              <span class="counter-value">${apiCounters.total}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
 
-    this.elements.dailyReset.textContent = `Sıfırlanma: ${nextDay.toLocaleString('tr-TR')}`;
-    this.elements.hourlyReset.textContent = `Sıfırlanma: ${nextHour.toLocaleString('tr-TR')}`;
-
-    // Uyarı durumları
-    const dailyItem = this.elements.rateLimitStatus.querySelector('.limit-item:first-child');
-    const hourlyItem = this.elements.rateLimitStatus.querySelector('.limit-item:last-child');
-
-    // Günlük limit uyarıları
-    if (dailyPercentage >= 90) {
-      dailyItem.classList.add('danger');
-      dailyItem.classList.remove('warning');
-    } else if (dailyPercentage >= 70) {
-      dailyItem.classList.add('warning');
-      dailyItem.classList.remove('danger');
-    } else {
-      dailyItem.classList.remove('warning', 'danger');
+    // Rate limit bölümünü request counters olarak güncelle
+    if (this.elements.rateLimitStatus) {
+      this.elements.rateLimitStatus.innerHTML = `
+        <div class="request-counters">
+          <h4>📊 API Kullanım Takibi</h4>
+          <p class="counters-description">
+            Aşağıda seçtiğiniz API'lerle yaptığınız çeviri sayılarını görebilirsiniz.
+            Bu sayılar sadece takip amaçlıdır, sınırlama uygulanmaz.
+          </p>
+          <div class="counters-list">
+            ${countersHtml}
+          </div>
+          <div class="counters-note">
+            <small>💡 Not: Bu sayılar sadece bilgi amaçlıdır. API provider'larının kendi limitleri geçerli olacaktır.</small>
+          </div>
+        </div>
+      `;
     }
 
-    // Saatlik limit uyarıları
-    if (hourlyPercentage >= 90) {
-      hourlyItem.classList.add('danger');
-      hourlyItem.classList.remove('warning');
-    } else if (hourlyPercentage >= 70) {
-      hourlyItem.classList.add('warning');
-      hourlyItem.classList.remove('danger');
-    } else {
-      hourlyItem.classList.remove('warning', 'danger');
-    }
-
-    // Rate limit bölümünü göster (sadece Gemini API için)
-    if (this.settings && this.settings.selectedAPI === 'gemini') {
+    // Rate limit bölümünü her zaman göster (sadece Gemini değil, tüm API'ler için)
+    if (this.elements.rateLimitItem) {
       this.elements.rateLimitItem.style.display = 'block';
-    } else {
-      this.elements.rateLimitItem.style.display = 'none';
     }
   }
 

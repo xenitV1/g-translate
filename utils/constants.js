@@ -67,6 +67,7 @@ const APP_CONSTANTS = {
     SWITCH_API: "switch_api",
     SET_API_KEY: "set_api_key",
     GET_CURRENT_API: "get_current_api",
+    GET_REQUEST_COUNTERS: "get_request_counters",
   },
 
   // Storage Keys
